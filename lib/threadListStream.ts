@@ -5,6 +5,11 @@ import {ReadableOptions} from "stream"
 import {PaginatedGoogleApiStream} from './paginatedGoogleApiStream'
 import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
 
+export declare interface ThreadListStream {
+  on(event: 'data', listener: (message: google.gmail.v1.Thread) => void): this;
+  on(event: string, listener: Function): this;  
+}
+
 /**
  * @param {google.gmail.v1.Thread} out
  */

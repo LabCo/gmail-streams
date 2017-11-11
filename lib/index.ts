@@ -16,7 +16,18 @@ export interface IGmailMsgsParams {
   before?: number | string
 }
 
-export function gmailMessagesStream(authClient: OAuth2Client, params: IGmailMsgsParams) {
+export declare interface GmailMessageStream extends NodeJS.ReadableStream {
+  on(event: 'data', listener: (message: google.gmail.v1.Message) => void): this;
+  on(event: string, listener: Function): this;  
+}
+
+/**
+ * @param authClient 
+ * @param params 
+ * 
+ * @param {google.gmail.v1.Message} out
+ */
+export function gmailMessagesStream(authClient: OAuth2Client, params: IGmailMsgsParams): GmailMessageStream {
   if(authClient == null) {
     throw new Error("authClient is not defined")
   }
@@ -47,7 +58,7 @@ export function gmailMessagesStream(authClient: OAuth2Client, params: IGmailMsgs
   // gmailMessageStream.on( "end", () => console.log( chalk.green.dim( `finished extracting ${messagesCount} messgaes from threads` ) ) );
 
   // const messagesStream = threadListStream.pipe(fullThreadStream).pipe(gmailMessageStream)
-  return messagesStream
+  return messagesStream as GmailMessageStream
 }
 
 
@@ -69,7 +80,7 @@ export function gmailMessagesSinceHistoryIdStream(account:string, auth:any, hist
   });
 
   // gmailMessageStream.on( "data",  (message) => console.log("fetched full message:", message.id) )
-  gmailMessageStream.on( "error", error => console.log( chalk.red.bold( "ERROR: failed fetching full messages" ), error ) );
+  gmailMessageStream.on( "error", (error: any) => console.log( chalk.red.bold( "ERROR: failed fetching full messages" ), error ) );
   gmailMessageStream.on( "end", (end:any) => {
     if(!disableLogging) { 
       console.log( chalk.green.bold( "finished fetchng full messages" ) ) 

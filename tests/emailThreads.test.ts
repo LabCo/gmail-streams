@@ -2,6 +2,7 @@ import {} from "jest"
 import {gmailMessagesStream} from '../lib'
 
 import {Helper} from "../lib/gAuthHelper"
+import * as google from 'googleapis'
 
 describe("testing list streams", () => {
 
@@ -16,10 +17,12 @@ describe("testing list streams", () => {
 
       let counter = 0
       stream.on("data", data => {
-        console.log("DATA:", JSON.stringify(data, null, 2))
+        console.log("snippet:", data.snippet)
+        console.log("date:", new Date( parseInt(data.internalDate)) ) 
+        
         counter += 1;
       })
-      stream.on("error", error => {
+      stream.on("error", (error:any) => {
         done.fail(error)
       })
       stream.on("end", () => {

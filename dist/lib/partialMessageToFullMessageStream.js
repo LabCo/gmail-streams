@@ -4,11 +4,6 @@ const google = require("googleapis");
 const gmail = google.gmail('v1');
 const LeakyBucket = require('leaky-bucket');
 const parallelTransform_1 = require("./parallelTransform");
-/**
- *
- * @param {google.gmail.v1.}
- *
- */
 class PartialMessageToFullMessageStream extends parallelTransform_1.default {
     constructor(auth, options) {
         const withObjOptions = Object.assign({}, options, { maxParallel: 15, objectMode: true });

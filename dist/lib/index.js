@@ -7,6 +7,12 @@ const fullThreadToMessageStream_1 = require("./fullThreadToMessageStream");
 const newMessagesSinceStream_1 = require("./newMessagesSinceStream");
 const partialMessageToFullMessageStream_1 = require("./partialMessageToFullMessageStream");
 const pumpify = require("pumpify");
+/**
+ * @param authClient
+ * @param params
+ *
+ * @param {google.gmail.v1.Message} out
+ */
 function gmailMessagesStream(authClient, params) {
     if (authClient == null) {
         throw new Error("authClient is not defined");
@@ -61,7 +67,7 @@ function gmailMessagesSinceHistoryIdStream(account, auth, historyId, disableLogg
         }
     });
     // gmailMessageStream.on( "data",  (message) => console.log("fetched full message:", message.id) )
-    gmailMessageStream.on("error", error => console.log(chalk_1.default.red.bold("ERROR: failed fetching full messages"), error));
+    gmailMessageStream.on("error", (error) => console.log(chalk_1.default.red.bold("ERROR: failed fetching full messages"), error));
     gmailMessageStream.on("end", (end) => {
         if (!disableLogging) {
             console.log(chalk_1.default.green.bold("finished fetchng full messages"));

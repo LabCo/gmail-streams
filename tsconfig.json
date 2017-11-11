@@ -7,6 +7,6 @@
     "strict": true,
     "baseUrl": "."
   },
-  "include": [ "lib/**/*", "types/**/*" ]
+  "include": [ "lib/**/*", "tests/**/*", "types/**/*" ]
   // "exclude": [ "node_modules" ]
 }
