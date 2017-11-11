@@ -13,10 +13,6 @@
 //   type Stream = NodeJS.ReadableStream | NodeJS.WritableStream;
 // }
 
-// declare module pumpify {
-//   (...streams: pumpify.Stream[]): pumpify.Stream;
-// }
-
 // export = pumpify;
 
 declare module 'pumpify'

@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import { ReadableOptions } from "stream";
 import { PaginatedGoogleApiStream } from './paginatedGoogleApiStream';
-export declare class ThreadListStream extends PaginatedGoogleApiStream {
-    constructor(auth: any, query: any, options?: ReadableOptions);
+import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
+export declare class ThreadListStream extends PaginatedGoogleApiStream<google.gmail.v1.ListThreadsResponse, google.gmail.v1.Thread> {
+    constructor(auth: OAuth2Client, query: any, options?: ReadableOptions);
 }

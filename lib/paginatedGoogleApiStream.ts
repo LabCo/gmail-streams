@@ -1,13 +1,17 @@
 import chalk from  "chalk"
 import { Readable, ReadableOptions } from 'stream'
 
-export type GApiCallback = (error:any, body:any) => void
+export type GApiCallback<T> = (error: any, body: T, response: any) => void
 
-export class PaginatedGoogleApiStream extends Readable {
+export interface GApiRes {
+  nextPageToken: string
+}
 
-  fetchFn: (params:any, cb:GApiCallback) => void
+export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
+
+  fetchFn: (params:any, cb:GApiCallback<T>) => void
   initialParams: any
-  objectsExtractor: any
+  objectsExtractor: (body:T) => O[]
   objectsName: string
   currentPage: number
   maxPages?: number
@@ -15,7 +19,12 @@ export class PaginatedGoogleApiStream extends Readable {
   nextPageToken?: string
 
 
-  constructor(fetchFn: (params:any, cb:GApiCallback) => void, initialParams: any, objectsExtractor: any, objectsName: string, maxPages?: number, options?:ReadableOptions ) {
+  constructor(fetchFn: (params:any, cb:GApiCallback<T>) => void, 
+              initialParams: any, 
+              objectsExtractor: (body:T) => O[], 
+              objectsName: string, 
+              maxPages?: number, 
+              options?:ReadableOptions ) {
     const withObjOptions = Object.assign({}, options, { objectMode:true })
     super(withObjOptions);
 
@@ -34,7 +43,8 @@ export class PaginatedGoogleApiStream extends Readable {
   pushObject() {
     // if there are still threads buffered, push the buffered thread
     if(this.fetchedObjects && this.fetchedObjects.length > 0) {
-      // do nothing
+      const object = this.fetchedObjects.shift()
+      this.push(object)
     }
     else if(this.fetchedObjects == null) {
       // no obects have been fetched in, do initial fetch
@@ -65,19 +75,11 @@ export class PaginatedGoogleApiStream extends Readable {
 
       if(error) {
         this.fetchedObjects = []
-        // console.error(`Failed while getting ${this.objectsName}:`, error)
-        // this.push(error, null)
-        // this.push(null, null)
         this.emit('error', error);
-        // this.push()
       }
-      else if(body.error) {
+      else if((<any>body).error) {
         this.fetchedObjects = []
-        // console.error(`Failed while getting ${this.objectsName}:`, body)
-        // this.push(body.error, null)
-        // this.push(null, null)
-        this.emit('error', body.error);
-        // this.push()
+        this.emit('error', (<any>body).error);
       }
       else {
         // no errors emitt the threads

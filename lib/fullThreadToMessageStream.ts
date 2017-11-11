@@ -1,10 +1,15 @@
 import { Transform, TransformOptions } from 'stream'
+import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
 
+/**
+ * @param {google.gmail.v1.Thread} in
+ * @param {google.gmail.v1.Message} out
+ */
 export class FullThreadToMessageStream extends Transform {
 
   auth: any;
 
-  constructor(auth: any, options?: TransformOptions) {
+  constructor(auth: OAuth2Client, options?: TransformOptions) {
     super({objectMode: true});
     this.auth = auth
   }

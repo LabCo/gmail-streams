@@ -57,3 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
+# secret token info
+conf/client_secret.json
+conf/.credentials
