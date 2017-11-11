@@ -1,4 +1,9 @@
 import ParallelTransform from './parallelTransform';
+/**
+ *
+ * @param {google.gmail.v1.}
+ *
+ */
 export declare class PartialMessageToFullMessageStream extends ParallelTransform {
     auth: any;
     limiter: any;

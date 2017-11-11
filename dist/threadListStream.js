@@ -3,6 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const google = require("googleapis");
 const gmail = google.gmail('v1');
 const paginatedGoogleApiStream_1 = require("./paginatedGoogleApiStream");
+/**
+ * @param {google.gmail.v1.Thread} out
+ */
 class ThreadListStream extends paginatedGoogleApiStream_1.PaginatedGoogleApiStream {
     constructor(auth, query, options) {
         const fetchFn = gmail.users.threads.list;
