@@ -8,19 +8,20 @@ export interface GmailMessageStream extends NodeJS.ReadableStream {
     on(event: 'data', listener: (message: google.gmail.v1.Message) => void): this;
     on(event: string, listener: Function): this;
 }
+export { GoogleAuthTestHelper } from "./gAuthHelper";
 export declare module GmailStreams {
     /**
      * @param authClient
      * @param params
      *
-     * @returns stream with {google.gmail.v1.Message} as data
+     * @returns stream with {googleapis.gmail.v1.Message} as data
      */
     function messages(authClient: OAuth2Client, params?: IGmailMsgsParams): GmailMessageStream;
     /**
       * @param authClient
       * @param historyId
       *
-      * @returns stream with {google.gmail.v1.Message} as data
+      * @returns stream with {googleapis.gmail.v1.Message} as data
       */
     function messagesSince(authClient: OAuth2Client, historyId: string): GmailMessageStream;
 }

@@ -3,13 +3,13 @@ import * as readline from 'readline'
 
 import googleAuth = require('google-auth-library')
 
-export class Helper {
+export class GoogleAuthTestHelper {
 
   // If modifying these scopes, delete your previously saved credentials
   // at ~/.credentials/gmail-nodejs-quickstart.json  
   static SCOPES = ['email', 'profile', 'https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/admin.directory.user.alias.readonly'];
   static TOKEN_DIR = 'conf/.credentials/';
-  static TOKEN_PATH = Helper.TOKEN_DIR + 'gmail-streams-auth.json';
+  static TOKEN_PATH = GoogleAuthTestHelper.TOKEN_DIR + 'gmail-auth.json';
 
   static readFileP(fileName: string): Promise<any> {
     return new Promise( (resolve, reject) => {

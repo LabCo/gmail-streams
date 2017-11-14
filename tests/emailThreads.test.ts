@@ -1,7 +1,6 @@
 import {} from "jest"
-import {GmailStreams} from '../lib'
+import {GmailStreams, GoogleAuthTestHelper} from '../lib'
 
-import {Helper} from "../lib/gAuthHelper"
 import * as google from 'googleapis'
 import { setTimeout } from "timers";
 
@@ -16,7 +15,7 @@ describe("testing list streams", () => {
       after: "2016/12/08"
     }
 
-    Helper.getClient().then( myClient => {     
+    GoogleAuthTestHelper.getClient().then( myClient => {     
       client = myClient
       const stream = GmailStreams.messages(myClient, params)
       stream.on("data", data => messages.push(data))

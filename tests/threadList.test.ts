@@ -1,7 +1,7 @@
 import {} from "jest"
 import {ThreadListStream} from '../lib/threadListStream'
 
-import {Helper} from "../lib/gAuthHelper"
+import {GoogleAuthTestHelper} from "../lib"
 import * as google from 'googleapis'
 import { setTimeout } from "timers";
 
@@ -9,7 +9,7 @@ describe("testing list streams", () => {
 
   let client: any = null
   beforeAll( done => {
-    Helper.getClient().then( myClient => {     
+    GoogleAuthTestHelper.getClient().then( myClient => {     
       client = myClient
       done()
     }).catch( error => {

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const readline = require("readline");
 const googleAuth = require("google-auth-library");
-class Helper {
+class GoogleAuthTestHelper {
     static readFileP(fileName) {
         return new Promise((resolve, reject) => {
             fs.readFile(fileName, (err, content) => {
@@ -113,7 +113,7 @@ class Helper {
 }
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/gmail-nodejs-quickstart.json  
-Helper.SCOPES = ['email', 'profile', 'https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/admin.directory.user.alias.readonly'];
-Helper.TOKEN_DIR = 'conf/.credentials/';
-Helper.TOKEN_PATH = Helper.TOKEN_DIR + 'gmail-streams-auth.json';
-exports.Helper = Helper;
+GoogleAuthTestHelper.SCOPES = ['email', 'profile', 'https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/admin.directory.user.alias.readonly'];
+GoogleAuthTestHelper.TOKEN_DIR = 'conf/.credentials/';
+GoogleAuthTestHelper.TOKEN_PATH = GoogleAuthTestHelper.TOKEN_DIR + 'gmail-auth.json';
+exports.GoogleAuthTestHelper = GoogleAuthTestHelper;

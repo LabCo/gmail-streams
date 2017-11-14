@@ -1,4 +1,4 @@
-export declare class Helper {
+export declare class GoogleAuthTestHelper {
     static SCOPES: string[];
     static TOKEN_DIR: string;
     static TOKEN_PATH: string;

@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const threadListStream_1 = require("../lib/threadListStream");
-const gAuthHelper_1 = require("../lib/gAuthHelper");
+const lib_1 = require("../lib");
 describe("testing list streams", () => {
     let client = null;
     beforeAll(done => {
-        gAuthHelper_1.Helper.getClient().then(myClient => {
+        lib_1.GoogleAuthTestHelper.getClient().then(myClient => {
             client = myClient;
             done();
         }).catch(error => {

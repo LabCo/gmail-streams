@@ -6,13 +6,15 @@ const fullThreadToMessageStream_1 = require("./fullThreadToMessageStream");
 const newMessagesSinceStream_1 = require("./newMessagesSinceStream");
 const partialMessageToFullMessageStream_1 = require("./partialMessageToFullMessageStream");
 const pumpify = require("pumpify");
+var gAuthHelper_1 = require("./gAuthHelper");
+exports.GoogleAuthTestHelper = gAuthHelper_1.GoogleAuthTestHelper;
 var GmailStreams;
 (function (GmailStreams) {
     /**
      * @param authClient
      * @param params
      *
-     * @returns stream with {google.gmail.v1.Message} as data
+     * @returns stream with {googleapis.gmail.v1.Message} as data
      */
     function messages(authClient, params) {
         if (authClient == null) {
@@ -40,7 +42,7 @@ var GmailStreams;
       * @param authClient
       * @param historyId
       *
-      * @returns stream with {google.gmail.v1.Message} as data
+      * @returns stream with {googleapis.gmail.v1.Message} as data
       */
     function messagesSince(authClient, historyId) {
         if (historyId == null) {

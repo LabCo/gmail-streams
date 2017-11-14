@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const lib_1 = require("../lib");
-const gAuthHelper_1 = require("../lib/gAuthHelper");
 describe("testing list streams", () => {
     const messages = [];
     let client = null;
@@ -10,7 +9,7 @@ describe("testing list streams", () => {
             before: "2016/12/15",
             after: "2016/12/08"
         };
-        gAuthHelper_1.Helper.getClient().then(myClient => {
+        lib_1.GoogleAuthTestHelper.getClient().then(myClient => {
             client = myClient;
             const stream = lib_1.GmailStreams.messages(myClient, params);
             stream.on("data", data => messages.push(data));

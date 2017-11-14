@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import * as google from 'googleapis';
+import * as googleapis from 'googleapis';
 
 import {ThreadListStream} from './threadListStream'
 import {ParitalThreadToFullThreadStream} from './paritalThreadToFullThreadStream'
@@ -21,13 +21,15 @@ export declare interface GmailMessageStream extends NodeJS.ReadableStream {
   on(event: string, listener: Function): this;  
 }
 
+export {GoogleAuthTestHelper} from "./gAuthHelper"
+
 export module GmailStreams {
 
   /**
    * @param authClient 
    * @param params 
    * 
-   * @returns stream with {google.gmail.v1.Message} as data
+   * @returns stream with {googleapis.gmail.v1.Message} as data
    */
   export function messages(authClient: OAuth2Client, params?: IGmailMsgsParams): GmailMessageStream {
     if(authClient == null) {
@@ -52,7 +54,7 @@ export module GmailStreams {
    * @param authClient 
    * @param historyId 
    * 
-   * @returns stream with {google.gmail.v1.Message} as data
+   * @returns stream with {googleapis.gmail.v1.Message} as data
    */
   export function messagesSince(authClient: OAuth2Client, historyId:string) {
     if(historyId == null) { throw new Error("historyId is not defined") }
