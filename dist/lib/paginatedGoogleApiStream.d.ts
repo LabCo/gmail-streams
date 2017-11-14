@@ -4,6 +4,9 @@ export declare type GApiCallback<T> = (error: any, body: T, response: any) => vo
 export interface GApiRes {
     nextPageToken: string;
 }
+export interface GApiOptions {
+    maxResults: number;
+}
 export declare class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
     fetchFn: (params: any, cb: GApiCallback<T>) => void;
     initialParams: any;

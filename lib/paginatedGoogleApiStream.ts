@@ -7,6 +7,10 @@ export interface GApiRes {
   nextPageToken: string
 }
 
+export interface GApiOptions {
+  maxResults: number
+}
+
 export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
 
   fetchFn: (params:any, cb:GApiCallback<T>) => void

@@ -3,6 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const google = require("googleapis");
 const gmail = google.gmail('v1');
 const paginatedGoogleApiStream_1 = require("./paginatedGoogleApiStream");
+/**
+ * @param {google.gmail.v1.Message} out
+ */
 class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleApiStream {
     constructor(auth, historyId, maxPages) {
         const fetchFn = gmail.users.history.list;

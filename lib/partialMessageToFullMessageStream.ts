@@ -6,9 +6,8 @@ const LeakyBucket = require('leaky-bucket');
 import ParallelTransform from './parallelTransform'
 
 /**
- * 
- * @param {google.gmail.v1.Message}
- * 
+ * @param {google.gmail.v1.Message} in
+ * @param {google.gmail.v1.Message} out
  */
 export declare interface PartialMessageToFullMessageStream {
   on(event: 'data', listener: (message: google.gmail.v1.Message) => void): this;
@@ -27,7 +26,7 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
     this.limiter = new LeakyBucket(200, 1, 100000);
   }
 
-  _parallelTransform(partialMessage: any, encoding: string, done: Function) {
+  _parallelTransform(partialMessage: google.gmail.v1.Message, encoding: string, done: Function) {
 		const messageId = partialMessage.id
 
     if(messageId == null) {
