@@ -2,8 +2,8 @@
   "name": "gmail-stream",
   "version": "1.0.0",
   "description": "Stream gmail emails",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "jest"
