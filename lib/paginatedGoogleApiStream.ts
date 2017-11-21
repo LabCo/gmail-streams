@@ -13,9 +13,9 @@ export interface GApiOptions {
 
 export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
 
-  fetchFn: (params:any, cb:GApiCallback<T>) => void
-  initialParams: any
-  objectsExtractor: (body:T) => O[]
+  protected fetchFn: (params:any, cb:GApiCallback<T>) => void
+  protected initialParams: any
+  protected objectsExtractor: (body:T) => O[]
   objectsName: string
   currentPage: number
   maxPages?: number
@@ -52,12 +52,12 @@ export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
     }
     else if(this.fetchedObjects == null) {
       // no obects have been fetched in, do initial fetch
-      this.fetchInNextPage()
+      this.fetchInNextPage(true)
     }
     else if(this.fetchedObjects.length <= 0) {
       if(this.nextPageToken && (this.maxPages == null || this.currentPage < this.maxPages) ) {
         // no more threads but there is still a next page, fetch in the next page
-        this.fetchInNextPage()
+        this.fetchInNextPage(false)
       } else {
         // no more threads and no more next page token, so we are done
         this.push(null)
@@ -66,7 +66,7 @@ export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
     }
   }
 
-  fetchInNextPage() {
+  protected fetchInNextPage(isInitialFetch: boolean) {
     let params = Object.assign({}, this.initialParams)
     if(this.nextPageToken) { params.pageToken = this.nextPageToken }
 
@@ -79,11 +79,11 @@ export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
 
       if(error) {
         this.fetchedObjects = []
-        this.emit('error', error);
+        isInitialFetch ? this._onFirstFetchError(error) : this._onError(error)
       }
       else if((<any>body).error) {
         this.fetchedObjects = []
-        this.emit('error', (<any>body).error);
+        isInitialFetch ? this._onFirstFetchError((<any>body).error) : this._onError((<any>body).error)
       }
       else {
         // no errors emitt the threads
@@ -110,6 +110,14 @@ export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
         this.pushObject()
       }
     })
+  }
+
+  _onFirstFetchError(error: any) {
+    this.emit('error', error);        
+  }
+
+  _onError(error: any) {
+    this.emit('error', error);    
   }
 
   _read(size: number) {

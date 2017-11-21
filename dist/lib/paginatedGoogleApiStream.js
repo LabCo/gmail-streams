@@ -23,12 +23,12 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
         }
         else if (this.fetchedObjects == null) {
             // no obects have been fetched in, do initial fetch
-            this.fetchInNextPage();
+            this.fetchInNextPage(true);
         }
         else if (this.fetchedObjects.length <= 0) {
             if (this.nextPageToken && (this.maxPages == null || this.currentPage < this.maxPages)) {
                 // no more threads but there is still a next page, fetch in the next page
-                this.fetchInNextPage();
+                this.fetchInNextPage(false);
             }
             else {
                 // no more threads and no more next page token, so we are done
@@ -37,7 +37,7 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
             }
         }
     }
-    fetchInNextPage() {
+    fetchInNextPage(isInitialFetch) {
         let params = Object.assign({}, this.initialParams);
         if (this.nextPageToken) {
             params.pageToken = this.nextPageToken;
@@ -48,11 +48,11 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
         this.fetchFn(params, (error, body) => {
             if (error) {
                 this.fetchedObjects = [];
-                this.emit('error', error);
+                isInitialFetch ? this._onFirstFetchError(error) : this._onError(error);
             }
             else if (body.error) {
                 this.fetchedObjects = [];
-                this.emit('error', body.error);
+                isInitialFetch ? this._onFirstFetchError(body.error) : this._onError(body.error);
             }
             else {
                 // no errors emitt the threads
@@ -81,6 +81,12 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
                 this.pushObject();
             }
         });
+    }
+    _onFirstFetchError(error) {
+        this.emit('error', error);
+    }
+    _onError(error) {
+        this.emit('error', error);
     }
     _read(size) {
         this.pushObject();

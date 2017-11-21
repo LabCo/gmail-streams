@@ -19,5 +19,29 @@ class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleA
         super(fetchFn, initialParams, objectsExtractor, 'new messages list', maxPages);
         this.historyId = historyId;
     }
+    _onFirstFetchError(error) {
+        if (error && error.code != null && error.code == 404) {
+            // fall back to fetching the last month of emails
+            this.switchToMessagesFetch();
+            this.fetchInNextPage(false);
+        }
+        else {
+            super._onFirstFetchError(error);
+        }
+    }
+    switchToMessagesFetch() {
+        const fetchFn = gmail.users.messages.list;
+        const objectsExtractor = (body) => {
+            const messages = body && body.messages;
+            return messages;
+        };
+        const d = new Date();
+        d.setMonth(d.getMonth() - 1);
+        const secondsTime = (d.getTime() / 1000).toFixed(0);
+        const initialParams = { auth: this.initialParams.auth, userId: "me", q: `after: ${secondsTime}`, maxResults: 1000 };
+        this.objectsExtractor = objectsExtractor;
+        this.initialParams = initialParams;
+        this.fetchFn = fetchFn;
+    }
 }
 exports.NewMessagesSinceStream = NewMessagesSinceStream;

@@ -6,7 +6,10 @@ export interface NewMessagesSinceStream {
 /**
  * @param {google.gmail.v1.Message} out
  */
-export declare class NewMessagesSinceStream extends PaginatedGoogleApiStream<google.gmail.v1.ListHistoryResponse, google.gmail.v1.Message> {
+export declare class NewMessagesSinceStream extends PaginatedGoogleApiStream<any, google.gmail.v1.Message> {
+    test: google.Request;
     historyId: string;
     constructor(auth: any, historyId: string, maxPages?: number);
+    _onFirstFetchError(error: any): void;
+    private switchToMessagesFetch();
 }

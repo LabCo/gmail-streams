@@ -11,13 +11,14 @@ export declare interface NewMessagesSinceStream {
 /**
  * @param {google.gmail.v1.Message} out
  */
-export class NewMessagesSinceStream extends PaginatedGoogleApiStream<google.gmail.v1.ListHistoryResponse, google.gmail.v1.Message> {
+export class NewMessagesSinceStream extends PaginatedGoogleApiStream<any, google.gmail.v1.Message> {
 
+  test: google.Request
+  
   historyId: string;
 
   constructor(auth: any, historyId: string, maxPages?: number) {
     const fetchFn = gmail.users.history.list
-
     const objectsExtractor = (body:google.gmail.v1.ListHistoryResponse) => {
       const history = body && body.history
       const addedMessages = history && history.map(h => h.messagesAdded.map( (ma) => ma.message))
@@ -29,4 +30,33 @@ export class NewMessagesSinceStream extends PaginatedGoogleApiStream<google.gmai
     super(fetchFn, initialParams, objectsExtractor, 'new messages list', maxPages);
     this.historyId = historyId
   }
+
+  _onFirstFetchError(error: any) {    
+    if(error && error.code != null && error.code == 404) {
+      // fall back to fetching the last month of emails
+
+      this.switchToMessagesFetch()
+      this.fetchInNextPage(false)
+    } else {
+      super._onFirstFetchError(error)
+    }
+  }
+
+  private switchToMessagesFetch() {
+    const fetchFn = gmail.users.messages.list
+    const objectsExtractor = (body:google.gmail.v1.ListMessagesResponse) => {
+      const messages = body && body.messages
+      return messages
+    }
+
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    const secondsTime = (d.getTime() / 1000).toFixed(0)
+    const initialParams = { auth: this.initialParams.auth, userId: "me", q:`after: ${secondsTime}`, maxResults:1000 }
+
+    this.objectsExtractor = objectsExtractor
+    this.initialParams = initialParams
+    this.fetchFn = fetchFn
+  }
+  
 }

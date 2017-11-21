@@ -6,7 +6,7 @@ const LeakyBucket = require('leaky-bucket');
 const parallelTransform_1 = require("./parallelTransform");
 class PartialMessageToFullMessageStream extends parallelTransform_1.default {
     constructor(auth, options) {
-        const withObjOptions = Object.assign({}, options, { maxParallel: 15, objectMode: true });
+        const withObjOptions = Object.assign({}, options, { maxParallel: 20, objectMode: true });
         super(withObjOptions);
         this.auth = auth;
         this.limiter = new LeakyBucket(200, 1, 100000);
