@@ -6,7 +6,8 @@
   "types": "dist/lib/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "authenticate": "node dist/lib/authenticate.js"
   },
   "keywords": [],
   "author": "LabLabLab",
