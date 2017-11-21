@@ -1,10 +1,11 @@
+import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
 export declare class GoogleAuthTestHelper {
     static SCOPES: string[];
     static TOKEN_DIR: string;
     static TOKEN_PATH: string;
     static readFileP(fileName: string): Promise<any>;
-    static getClient(): Promise<any>;
-    static createClient(): Promise<any>;
+    static getClient(): Promise<OAuth2Client>;
+    static createClient(): Promise<OAuth2Client>;
     private static _getClient(createNew);
     /**
      * Create an OAuth2 client with the given credentials, and then execute the

@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as readline from 'readline'
 
 import googleAuth = require('google-auth-library')
+import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
 
 export class GoogleAuthTestHelper {
 
@@ -44,7 +45,7 @@ export class GoogleAuthTestHelper {
    *
    * @param {Object} credentials The authorization client credentials.
    */
-  private static authorize(credentials: any, createNew:boolean): Promise<any> {
+  private static authorize(credentials: any, createNew:boolean): Promise<OAuth2Client> {
     var clientSecret = credentials.installed.client_secret;
     var clientId = credentials.installed.client_id;
     var redirectUrl = credentials.installed.redirect_uris[0];
@@ -52,7 +53,7 @@ export class GoogleAuthTestHelper {
     var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
     // Check if we have previously stored a token.
-    const readFileP = new Promise( (resolve, reject) => {
+    const readFileP = new Promise<OAuth2Client>( (resolve, reject) => {
       fs.readFile(this.TOKEN_PATH, function(err, token) {
         if (err) { 
           reject(err)
@@ -76,7 +77,7 @@ export class GoogleAuthTestHelper {
    *
    * @param {google.auth.OAuth2} oauth2Client The OAuth2 client to get token for.
    */
-  private static getNewToken(oauth2Client: any): Promise<any> {
+  private static getNewToken(oauth2Client: any): Promise<OAuth2Client> {
     var authUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: this.SCOPES
@@ -87,7 +88,7 @@ export class GoogleAuthTestHelper {
       output: process.stdout
     });
 
-    return new Promise( (resolve, reject) => {
+    return new Promise<OAuth2Client>( (resolve, reject) => {
       rl.question('Enter the code from that page here: ', (code) => {
         rl.close();
         oauth2Client.getToken(code, (err:any, token:any) => {
