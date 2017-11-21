@@ -41,7 +41,6 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@types/chalk": "^2.2.0",
     "@types/pump": "^1.0.1",
     "@types/request": "^2.0.8",
     "chalk": "^2.3.0",
