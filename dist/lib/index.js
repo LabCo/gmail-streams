@@ -8,15 +8,17 @@ const partialMessageToFullMessageStream_1 = require("./partialMessageToFullMessa
 const pumpify = require("pumpify");
 var gAuthHelper_1 = require("./gAuthHelper");
 exports.GoogleAuthTestHelper = gAuthHelper_1.GoogleAuthTestHelper;
-var GmailStreams;
-(function (GmailStreams) {
+class GmailStreams {
+    static setLogLevel(level) {
+        this.logLevel = level;
+    }
     /**
      * @param authClient
      * @param params
      *
      * @returns stream with {googleapis.gmail.v1.Message} as data
      */
-    function messages(authClient, params) {
+    static messages(authClient, params) {
         if (authClient == null) {
             throw new Error("authClient is not defined");
         }
@@ -31,20 +33,19 @@ var GmailStreams;
             qArray.push(`after:${params.after}`);
         }
         const qString = (qArray.length > 0) ? qArray.join(" ") : null;
-        const threadListStream = new threadListStream_1.ThreadListStream(authClient, qString);
+        const threadListStream = new threadListStream_1.ThreadListStream(authClient, qString, undefined, this.logLevel);
         const fullThreadStream = new paritalThreadToFullThreadStream_1.ParitalThreadToFullThreadStream(authClient);
         const gmailMessageStream = new fullThreadToMessageStream_1.FullThreadToMessageStream(authClient);
         const messagesStream = pumpify.obj(threadListStream, fullThreadStream, gmailMessageStream);
         return messagesStream;
     }
-    GmailStreams.messages = messages;
     /**
       * @param authClient
       * @param historyId
       *
       * @returns stream with {googleapis.gmail.v1.Message} as data
       */
-    function messagesSince(authClient, historyId) {
+    static messagesSince(authClient, historyId) {
         if (historyId == null) {
             throw new Error("historyId is not defined");
         }
@@ -56,5 +57,6 @@ var GmailStreams;
         const stream = pumpify.obj(newMessagesStream, gmailMessageStream);
         return stream;
     }
-    GmailStreams.messagesSince = messagesSince;
-})(GmailStreams = exports.GmailStreams || (exports.GmailStreams = {}));
+}
+GmailStreams.logLevel = "error";
+exports.GmailStreams = GmailStreams;

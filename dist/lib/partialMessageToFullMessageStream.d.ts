@@ -1,3 +1,5 @@
+/// <reference types="winston" />
+import * as winston from "winston";
 import ParallelTransform from './parallelTransform';
 /**
  * @param {google.gmail.v1.Message} in
@@ -10,6 +12,7 @@ export interface PartialMessageToFullMessageStream {
 export declare class PartialMessageToFullMessageStream extends ParallelTransform {
     auth: any;
     limiter: any;
-    constructor(auth: any, options?: any);
+    logger: winston.LoggerInstance;
+    constructor(auth: any, logLevel?: string);
     _parallelTransform(partialMessage: google.gmail.v1.Message, encoding: string, done: Function): void;
 }

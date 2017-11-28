@@ -8,5 +8,5 @@ export interface ThreadListStream {
  * @param {google.gmail.v1.Thread} out
  */
 export declare class ThreadListStream extends PaginatedGoogleApiStream<google.gmail.v1.ListThreadsResponse, google.gmail.v1.Thread> {
-    constructor(auth: OAuth2Client, query: any, params?: GApiOptions);
+    constructor(auth: OAuth2Client, query: any, params?: GApiOptions, logLevel?: string);
 }

@@ -1,7 +1,7 @@
 import {} from "jest"
 import {ThreadListStream} from '../lib/threadListStream'
 
-import {GoogleAuthTestHelper} from "../lib"
+import {GmailStreams, GoogleAuthTestHelper} from "../lib"
 import * as google from 'googleapis'
 import { setTimeout } from "timers";
 
@@ -9,6 +9,8 @@ describe("testing list streams", () => {
 
   let client: any = null
   beforeAll( done => {
+    GmailStreams.setLogLevel("error")    
+
     GoogleAuthTestHelper.getClient().then( myClient => {     
       client = myClient
       done()
@@ -22,7 +24,7 @@ describe("testing list streams", () => {
     const query = "before:1481961600 after:1481270400"
 
     let counter = 0
-    const stream = new ThreadListStream(client, query, { maxResults: 4 })
+    const stream = new ThreadListStream(client, query, { maxResults: 4 }, "error")
     stream.on("data", data => threads.push(data))
     stream.on("error", (error:any) => done.fail(error))
     stream.on("end", () => {

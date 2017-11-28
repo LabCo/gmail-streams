@@ -7,7 +7,7 @@ const paginatedGoogleApiStream_1 = require("./paginatedGoogleApiStream");
  * @param {google.gmail.v1.Thread} out
  */
 class ThreadListStream extends paginatedGoogleApiStream_1.PaginatedGoogleApiStream {
-    constructor(auth, query, params) {
+    constructor(auth, query, params, logLevel) {
         const fetchFn = gmail.users.threads.list;
         const objectsExtractor = (body) => body.threads;
         const maxResults = (params && params.maxResults) ? params.maxResults : 500;
@@ -15,7 +15,7 @@ class ThreadListStream extends paginatedGoogleApiStream_1.PaginatedGoogleApiStre
         if (query) {
             initialParams.q = query;
         }
-        super(fetchFn, initialParams, objectsExtractor, 'threads list');
+        super(fetchFn, initialParams, objectsExtractor, 'threads list', undefined, logLevel);
     }
 }
 exports.ThreadListStream = ThreadListStream;

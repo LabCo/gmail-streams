@@ -1,6 +1,9 @@
 import * as google from 'googleapis'
 const gmail = google.gmail('v1');
 
+import * as winston from "winston"
+import { LabLogger } from "winston-lab"
+
 const LeakyBucket = require('leaky-bucket');
 
 import ParallelTransform from './parallelTransform'
@@ -18,12 +21,15 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
 
   auth: any
   limiter: any
+  logger: winston.LoggerInstance
 
-  constructor(auth: any, options?:any) {
-    const withObjOptions = Object.assign({}, options, { maxParallel: 20, objectMode:true })
+  constructor(auth: any, logLevel:string) {
+    const withObjOptions = { maxParallel: 20, objectMode:true }
     super(withObjOptions);
     this.auth = auth
     this.limiter = new LeakyBucket(200, 1, 100000);
+
+    this.logger = LabLogger.createFromClass(this, logLevel)
   }
 
   _parallelTransform(partialMessage: google.gmail.v1.Message, encoding: string, done: Function) {
@@ -43,7 +49,7 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
           if(response.statusCode == 404) {
             done()
           } else {
-            console.error("ERROR: Failed while fetching full message for", messageId, error)
+            this.logger.error("Failed to fetch message", messageId, "error:", error)
             // do not want to emit an error becasue the will break processing, so just label as done and emit nothing
             done()
           }
@@ -53,7 +59,7 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
           if((<any>body).error.code == 404) {
             done()
           } else {
-            console.error("ERROR: Failed while fetching full message for", messageId, (<any>body).error)
+            this.logger.error("Failed to fetch message", messageId, "error:", (<any>body).error)
             // do not want to emit an error becasue the will break processing, so just label as done and emit nothing
             done()
           }
@@ -64,7 +70,7 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
         }
       })
     }).catch( (error:any) => {
-      console.error("Could not throttle gmail message api call", error)
+      this.logger.error("Could not throttle gmail message api call", error)
       done(error)
     })
 

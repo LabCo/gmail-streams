@@ -14,10 +14,9 @@ export declare interface NewMessagesSinceStream {
 export class NewMessagesSinceStream extends PaginatedGoogleApiStream<any, google.gmail.v1.Message> {
 
   test: google.Request
-  
   historyId: string;
 
-  constructor(auth: any, historyId: string, maxPages?: number) {
+  constructor(auth: any, historyId: string, maxPages?: number, logLevel?: string) {
     const fetchFn = gmail.users.history.list
     const objectsExtractor = (body:google.gmail.v1.ListHistoryResponse) => {
       const history = body && body.history
@@ -27,7 +26,7 @@ export class NewMessagesSinceStream extends PaginatedGoogleApiStream<any, google
     }
     const initialParams = { auth: auth, userId: "me", startHistoryId: historyId, historyTypes: 'messageAdded', maxResults:1000 }
 
-    super(fetchFn, initialParams, objectsExtractor, 'new messages list', maxPages);
+    super(fetchFn, initialParams, objectsExtractor, 'new messages list', maxPages, logLevel);
     this.historyId = historyId
   }
 

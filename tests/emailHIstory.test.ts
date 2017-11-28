@@ -9,6 +9,7 @@ describe("testing getting messages since a history id", () => {
   const messages:google.gmail.v1.Message[] = []
   let client: any = null
   beforeAll( done => {
+    GmailStreams.setLogLevel("error")
 
     const params = {
       before: "2016/12/15",

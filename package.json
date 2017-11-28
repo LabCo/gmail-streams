@@ -49,6 +49,7 @@
     "googleapis": "^22.2.0",
     "leaky-bucket": "^2.1.1",
     "pumpify": "^1.3.5",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "winston-lab": "git+https://github.com/LabCo/winston-lab.git"
   }
 }

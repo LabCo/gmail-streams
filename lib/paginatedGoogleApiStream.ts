@@ -1,5 +1,7 @@
 import chalk from  "chalk"
 import { Readable, ReadableOptions } from 'stream'
+import { LabLogger } from "winston-lab"
+import * as winston from "winston"
 
 export type GApiCallback<T> = (error: any, body: T, response: any) => void
 
@@ -11,7 +13,7 @@ export interface GApiOptions {
   maxResults: number
 }
 
-export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
+export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
 
   protected fetchFn: (params:any, cb:GApiCallback<T>) => void
   protected initialParams: any
@@ -22,12 +24,15 @@ export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
   fetchedObjects: any
   nextPageToken?: string
 
+  protected logLevel: string | undefined
+  logger: winston.LoggerInstance
 
   constructor(fetchFn: (params:any, cb:GApiCallback<T>) => void, 
               initialParams: any, 
               objectsExtractor: (body:T) => O[], 
               objectsName: string, 
               maxPages?: number, 
+              logLevel?:string,
               options?:ReadableOptions ) {
     const withObjOptions = Object.assign({}, options, { objectMode:true })
     super(withObjOptions);
@@ -42,6 +47,9 @@ export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
     
     this.fetchedObjects = null
     this.nextPageToken = undefined//withObjOptions && withObjOptions.nextPageToken
+    this.logLevel = logLevel
+
+    this.logger = LabLogger.createFromClass(this, this.logLevel)
   }
 
   pushObject() {
@@ -73,7 +81,7 @@ export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
     let paramsWOutAuth = Object.assign({}, params)
     delete paramsWOutAuth["auth"]
 
-    console.log(chalk.blue.dim("Fetching next"), chalk.blue(this.objectsName), chalk.blue.dim("page with params"), JSON.stringify(paramsWOutAuth))
+    this.logger.info(chalk.blue.dim("Fetching next"), chalk.blue(this.objectsName), chalk.blue.dim("page with params"), JSON.stringify(paramsWOutAuth))
 
     this.fetchFn(params, (error, body) => {
 
@@ -97,9 +105,9 @@ export class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
         this.fetchedObjects = (this.fetchedObjects) ? this.fetchedObjects.concat(objects) : objects
 
         if(body.nextPageToken) {
-          console.log(chalk.blue.dim("Fetched page for"), chalk.blue(this.objectsName), chalk.blue.dim("next page is:"), body.nextPageToken)
+          this.logger.info(chalk.blue.dim("Fetched page for"), chalk.blue(this.objectsName), chalk.blue.dim("next page is:"), body.nextPageToken)
         } else {
-          console.log(chalk.blue.dim("Fetched the last page for"), chalk.blue(this.objectsName))
+          this.logger.info(chalk.blue.dim("Fetched the last page for"), chalk.blue(this.objectsName))
         }
 
         // update the next page token

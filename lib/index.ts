@@ -23,7 +23,13 @@ export declare interface GmailMessageStream extends NodeJS.ReadableStream {
 
 export {GoogleAuthTestHelper} from "./gAuthHelper"
 
-export module GmailStreams {
+export class GmailStreams {
+
+  private static logLevel = "error"
+
+  static setLogLevel(level: string) {
+    this.logLevel = level
+  }
 
   /**
    * @param authClient 
@@ -31,7 +37,7 @@ export module GmailStreams {
    * 
    * @returns stream with {googleapis.gmail.v1.Message} as data
    */
-  export function messages(authClient: OAuth2Client, params?: IGmailMsgsParams): GmailMessageStream {
+  static messages(authClient: OAuth2Client, params?: IGmailMsgsParams): GmailMessageStream {
     if(authClient == null) {
       throw new Error("authClient is not defined")
     }
@@ -42,8 +48,8 @@ export module GmailStreams {
     if(params && params.after) { qArray.push(`after:${params.after}`) }
     const qString = (qArray.length > 0) ? qArray.join(" ") : null
 
-    const threadListStream = new ThreadListStream(authClient, qString)
-    const fullThreadStream = new ParitalThreadToFullThreadStream(authClient)
+    const threadListStream = new ThreadListStream(authClient, qString, undefined, this.logLevel)
+    const fullThreadStream = new ParitalThreadToFullThreadStream(authClient, this.logLevel)
     const gmailMessageStream = new FullThreadToMessageStream(authClient)
 
     const messagesStream = pumpify.obj(threadListStream, fullThreadStream, gmailMessageStream)
@@ -56,14 +62,14 @@ export module GmailStreams {
    * 
    * @returns stream with {googleapis.gmail.v1.Message} as data
    */
-  export function messagesSince(authClient: OAuth2Client, historyId:string) {
+  static messagesSince(authClient: OAuth2Client, historyId:string) {
     if(historyId == null) { throw new Error("historyId is not defined") }
     if (! (typeof historyId === 'string') ) {
       throw new Error("historyId is not a string")
     }
 
-    const newMessagesStream = new NewMessagesSinceStream(authClient, historyId)
-    const gmailMessageStream = new PartialMessageToFullMessageStream(authClient)
+    const newMessagesStream = new NewMessagesSinceStream(authClient, historyId, undefined, this.logLevel)
+    const gmailMessageStream = new PartialMessageToFullMessageStream(authClient, this.logLevel)
 
     const stream = pumpify.obj(newMessagesStream, gmailMessageStream)
     return stream as GmailMessageStream

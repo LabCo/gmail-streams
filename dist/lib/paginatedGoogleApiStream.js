@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = require("chalk");
 const stream_1 = require("stream");
+const winston_lab_1 = require("winston-lab");
 class PaginatedGoogleApiStream extends stream_1.Readable {
-    constructor(fetchFn, initialParams, objectsExtractor, objectsName, maxPages, options) {
+    constructor(fetchFn, initialParams, objectsExtractor, objectsName, maxPages, logLevel, options) {
         const withObjOptions = Object.assign({}, options, { objectMode: true });
         super(withObjOptions);
         this.fetchFn = fetchFn;
@@ -14,6 +15,8 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
         this.maxPages = maxPages;
         this.fetchedObjects = null;
         this.nextPageToken = undefined; //withObjOptions && withObjOptions.nextPageToken
+        this.logLevel = logLevel;
+        this.logger = winston_lab_1.LabLogger.createFromClass(this, this.logLevel);
     }
     pushObject() {
         // if there are still threads buffered, push the buffered thread
@@ -44,7 +47,7 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
         }
         let paramsWOutAuth = Object.assign({}, params);
         delete paramsWOutAuth["auth"];
-        console.log(chalk_1.default.blue.dim("Fetching next"), chalk_1.default.blue(this.objectsName), chalk_1.default.blue.dim("page with params"), JSON.stringify(paramsWOutAuth));
+        this.logger.info(chalk_1.default.blue.dim("Fetching next"), chalk_1.default.blue(this.objectsName), chalk_1.default.blue.dim("page with params"), JSON.stringify(paramsWOutAuth));
         this.fetchFn(params, (error, body) => {
             if (error) {
                 this.fetchedObjects = [];
@@ -65,10 +68,10 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
                 }
                 this.fetchedObjects = (this.fetchedObjects) ? this.fetchedObjects.concat(objects) : objects;
                 if (body.nextPageToken) {
-                    console.log(chalk_1.default.blue.dim("Fetched page for"), chalk_1.default.blue(this.objectsName), chalk_1.default.blue.dim("next page is:"), body.nextPageToken);
+                    this.logger.info(chalk_1.default.blue.dim("Fetched page for"), chalk_1.default.blue(this.objectsName), chalk_1.default.blue.dim("next page is:"), body.nextPageToken);
                 }
                 else {
-                    console.log(chalk_1.default.blue.dim("Fetched the last page for"), chalk_1.default.blue(this.objectsName));
+                    this.logger.info(chalk_1.default.blue.dim("Fetched the last page for"), chalk_1.default.blue(this.objectsName));
                 }
                 // update the next page token
                 if (body.nextPageToken) {

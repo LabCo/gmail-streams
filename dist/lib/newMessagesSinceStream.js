@@ -7,7 +7,7 @@ const paginatedGoogleApiStream_1 = require("./paginatedGoogleApiStream");
  * @param {google.gmail.v1.Message} out
  */
 class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleApiStream {
-    constructor(auth, historyId, maxPages) {
+    constructor(auth, historyId, maxPages, logLevel) {
         const fetchFn = gmail.users.history.list;
         const objectsExtractor = (body) => {
             const history = body && body.history;
@@ -16,7 +16,7 @@ class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleA
             return addedMessages;
         };
         const initialParams = { auth: auth, userId: "me", startHistoryId: historyId, historyTypes: 'messageAdded', maxResults: 1000 };
-        super(fetchFn, initialParams, objectsExtractor, 'new messages list', maxPages);
+        super(fetchFn, initialParams, objectsExtractor, 'new messages list', maxPages, logLevel);
         this.historyId = historyId;
     }
     _onFirstFetchError(error) {

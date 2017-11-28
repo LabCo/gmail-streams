@@ -2,14 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const google = require("googleapis");
 const gmail = google.gmail('v1');
+const winston_lab_1 = require("winston-lab");
 const LeakyBucket = require('leaky-bucket');
 const parallelTransform_1 = require("./parallelTransform");
 class PartialMessageToFullMessageStream extends parallelTransform_1.default {
-    constructor(auth, options) {
-        const withObjOptions = Object.assign({}, options, { maxParallel: 20, objectMode: true });
+    constructor(auth, logLevel) {
+        const withObjOptions = { maxParallel: 20, objectMode: true };
         super(withObjOptions);
         this.auth = auth;
         this.limiter = new LeakyBucket(200, 1, 100000);
+        this.logger = winston_lab_1.LabLogger.createFromClass(this, logLevel);
     }
     _parallelTransform(partialMessage, encoding, done) {
         const messageId = partialMessage.id;
@@ -26,7 +28,7 @@ class PartialMessageToFullMessageStream extends parallelTransform_1.default {
                         done();
                     }
                     else {
-                        console.error("ERROR: Failed while fetching full message for", messageId, error);
+                        this.logger.error("Failed to fetch message", messageId, "error:", error);
                         // do not want to emit an error becasue the will break processing, so just label as done and emit nothing
                         done();
                     }
@@ -37,7 +39,7 @@ class PartialMessageToFullMessageStream extends parallelTransform_1.default {
                         done();
                     }
                     else {
-                        console.error("ERROR: Failed while fetching full message for", messageId, body.error);
+                        this.logger.error("Failed to fetch message", messageId, "error:", body.error);
                         // do not want to emit an error becasue the will break processing, so just label as done and emit nothing
                         done();
                     }
@@ -48,7 +50,7 @@ class PartialMessageToFullMessageStream extends parallelTransform_1.default {
                 }
             });
         }).catch((error) => {
-            console.error("Could not throttle gmail message api call", error);
+            this.logger.error("Could not throttle gmail message api call", error);
             done(error);
         });
     }
