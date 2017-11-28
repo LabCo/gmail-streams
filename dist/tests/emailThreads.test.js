@@ -5,6 +5,7 @@ describe("testing list streams", () => {
     const messages = [];
     let client = null;
     beforeAll(done => {
+        lib_1.GmailStreams.setLogLevel("error");
         const params = {
             before: "2016/12/15",
             after: "2016/12/08"

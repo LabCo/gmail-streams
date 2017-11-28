@@ -6,7 +6,7 @@ const stream_1 = require("stream");
  * @param {google.gmail.v1.Message} out
  */
 class FullThreadToMessageStream extends stream_1.Transform {
-    constructor(auth, options) {
+    constructor(auth) {
         super({ objectMode: true });
         this.auth = auth;
     }

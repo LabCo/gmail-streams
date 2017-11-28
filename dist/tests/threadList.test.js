@@ -5,6 +5,7 @@ const lib_1 = require("../lib");
 describe("testing list streams", () => {
     let client = null;
     beforeAll(done => {
+        lib_1.GmailStreams.setLogLevel("error");
         lib_1.GoogleAuthTestHelper.getClient().then(myClient => {
             client = myClient;
             done();
@@ -16,7 +17,7 @@ describe("testing list streams", () => {
         const threads = [];
         const query = "before:1481961600 after:1481270400";
         let counter = 0;
-        const stream = new threadListStream_1.ThreadListStream(client, query, { maxResults: 4 });
+        const stream = new threadListStream_1.ThreadListStream(client, query, { maxResults: 4 }, "error");
         stream.on("data", data => threads.push(data));
         stream.on("error", (error) => done.fail(error));
         stream.on("end", () => {

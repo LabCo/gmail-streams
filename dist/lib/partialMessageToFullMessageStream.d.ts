@@ -13,6 +13,6 @@ export declare class PartialMessageToFullMessageStream extends ParallelTransform
     auth: any;
     limiter: any;
     logger: winston.LoggerInstance;
-    constructor(auth: any, logLevel?: string);
+    constructor(auth: any, logLevel: string);
     _parallelTransform(partialMessage: google.gmail.v1.Message, encoding: string, done: Function): void;
 }

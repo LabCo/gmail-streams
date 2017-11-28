@@ -34,7 +34,7 @@ class GmailStreams {
         }
         const qString = (qArray.length > 0) ? qArray.join(" ") : null;
         const threadListStream = new threadListStream_1.ThreadListStream(authClient, qString, undefined, this.logLevel);
-        const fullThreadStream = new paritalThreadToFullThreadStream_1.ParitalThreadToFullThreadStream(authClient);
+        const fullThreadStream = new paritalThreadToFullThreadStream_1.ParitalThreadToFullThreadStream(authClient, this.logLevel);
         const gmailMessageStream = new fullThreadToMessageStream_1.FullThreadToMessageStream(authClient);
         const messagesStream = pumpify.obj(threadListStream, fullThreadStream, gmailMessageStream);
         return messagesStream;
@@ -52,8 +52,8 @@ class GmailStreams {
         if (!(typeof historyId === 'string')) {
             throw new Error("historyId is not a string");
         }
-        const newMessagesStream = new newMessagesSinceStream_1.NewMessagesSinceStream(authClient, historyId);
-        const gmailMessageStream = new partialMessageToFullMessageStream_1.PartialMessageToFullMessageStream(authClient);
+        const newMessagesStream = new newMessagesSinceStream_1.NewMessagesSinceStream(authClient, historyId, undefined, this.logLevel);
+        const gmailMessageStream = new partialMessageToFullMessageStream_1.PartialMessageToFullMessageStream(authClient, this.logLevel);
         const stream = pumpify.obj(newMessagesStream, gmailMessageStream);
         return stream;
     }
