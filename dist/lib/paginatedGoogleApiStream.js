@@ -22,6 +22,7 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
         // if there are still threads buffered, push the buffered thread
         if (this.fetchedObjects && this.fetchedObjects.length > 0) {
             const object = this.fetchedObjects.shift();
+            this.logger.debug("serving:\n", JSON.stringify(object, null, 2));
             this.push(object);
         }
         else if (this.fetchedObjects == null) {
@@ -36,6 +37,7 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
             else {
                 // no more threads and no more next page token, so we are done
                 this.push(null);
+                this.logger.debug("serving null");
                 // this.emit('end', null);        
             }
         }
