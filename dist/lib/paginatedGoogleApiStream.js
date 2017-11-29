@@ -51,11 +51,14 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
         delete paramsWOutAuth["auth"];
         this.logger.info(chalk_1.default.blue.dim("Fetching next"), chalk_1.default.blue(this.objectsName), chalk_1.default.blue.dim("page with params"), JSON.stringify(paramsWOutAuth));
         this.fetchFn(params, (error, body) => {
+            this.logger.debug("responded for fetching", JSON.stringify(paramsWOutAuth));
             if (error) {
+                this.logger.error("failed to fetch", error);
                 this.fetchedObjects = [];
                 isInitialFetch ? this._onFirstFetchError(error) : this._onError(error);
             }
             else if (body.error) {
+                this.logger.error("failed to fetch", error);
                 this.fetchedObjects = [];
                 isInitialFetch ? this._onFirstFetchError(body.error) : this._onError(body.error);
             }
