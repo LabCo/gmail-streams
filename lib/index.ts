@@ -1,6 +1,8 @@
 import chalk from 'chalk'
 import * as googleapis from 'googleapis';
 
+import { Transform } from "stream"
+
 import {ThreadListStream} from './threadListStream'
 import {ParitalThreadToFullThreadStream} from './paritalThreadToFullThreadStream'
 import {FullThreadToMessageStream} from './fullThreadToMessageStream'
@@ -50,7 +52,7 @@ export class GmailStreams {
 
     const threadListStream = new ThreadListStream(authClient, qString, undefined, this.logLevel)
     const fullThreadStream = new ParitalThreadToFullThreadStream(authClient, this.logLevel)
-    const gmailMessageStream = new FullThreadToMessageStream(authClient)
+    const gmailMessageStream = new FullThreadToMessageStream(authClient) 
 
     const messagesStream = pumpify.obj(threadListStream, fullThreadStream, gmailMessageStream)
     return messagesStream as GmailMessageStream
@@ -70,9 +72,20 @@ export class GmailStreams {
 
     const newMessagesStream = new NewMessagesSinceStream(authClient, historyId, undefined, this.logLevel)
     const gmailMessageStream = new PartialMessageToFullMessageStream(authClient, this.logLevel)
+    const dummyStream = new DummyTransform()    
 
-    const stream = pumpify.obj(newMessagesStream, gmailMessageStream)
+    // have to pass a dummy transform because pumpify does not work when the last stream
+    // is a ParallelTransform 
+    const stream = pumpify.obj(newMessagesStream, gmailMessageStream, dummyStream)
     return stream as GmailMessageStream
+  }
+
+}
+
+class DummyTransform extends Transform {
+
+  _transform(data: any, encoding: string, done: Function) {
+    done(null, data)
   }
 
 }

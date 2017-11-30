@@ -33,7 +33,7 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
   }
 
   _parallelTransform(partialMessage: google.gmail.v1.Message, encoding: string, done: Function) {
-		const messageId = partialMessage.id
+    const messageId = partialMessage.id
 
     if(messageId == null) {
       this.push("message id is null")
@@ -74,6 +74,6 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
       done(error)
     })
 
-	}
+  }
 
 }

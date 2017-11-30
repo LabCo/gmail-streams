@@ -102,6 +102,7 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
         isInitialFetch ? this._onFirstFetchError((<any>body).error) : this._onError((<any>body).error)
       }
       else {
+        this.logger.debug("fetched for", JSON.stringify(paramsWOutAuth))
         // no errors emitt the threads
 
         // add the fetched threads
@@ -130,12 +131,18 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
 
   _onFirstFetchError(error: any) {
     this.logger.debug("emitting error", error)
-    this.emit('error', error);        
+    this.emit('error', error);
+    
+    // an error happend, so we also have to end the stream becasue an error does not end it     
+    this.emit("end")
   }
 
   _onError(error: any) {
     this.logger.debug("emitting error", error)    
     this.emit('error', error);    
+    
+    // an error happend, so we also have to end the stream becasue an error does not end it     
+    this.emit("end") 
   }
 
   _read(size: number) {
