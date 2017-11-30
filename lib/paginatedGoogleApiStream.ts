@@ -90,13 +90,13 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
       this.logger.debug("responded for fetching", JSON.stringify(paramsWOutAuth))
 
       if(error) {
-        this.logger.error("failed to fetch", error)
+        this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), error)
 
         this.fetchedObjects = []
         isInitialFetch ? this._onFirstFetchError(error) : this._onError(error)
       }
       else if((<any>body).error) {
-        this.logger.error("failed to fetch", error)        
+        this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), error)        
 
         this.fetchedObjects = []
         isInitialFetch ? this._onFirstFetchError((<any>body).error) : this._onError((<any>body).error)
@@ -129,10 +129,12 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
   }
 
   _onFirstFetchError(error: any) {
+    this.logger.debug("emitting error", error)
     this.emit('error', error);        
   }
 
   _onError(error: any) {
+    this.logger.debug("emitting error", error)    
     this.emit('error', error);    
   }
 
