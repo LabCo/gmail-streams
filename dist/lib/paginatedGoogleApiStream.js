@@ -53,12 +53,12 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
         this.fetchFn(params, (error, body) => {
             this.logger.debug("responded for fetching", JSON.stringify(paramsWOutAuth));
             if (error) {
-                this.logger.error("failed to fetch", error);
+                this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), error);
                 this.fetchedObjects = [];
                 isInitialFetch ? this._onFirstFetchError(error) : this._onError(error);
             }
             else if (body.error) {
-                this.logger.error("failed to fetch", error);
+                this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), error);
                 this.fetchedObjects = [];
                 isInitialFetch ? this._onFirstFetchError(body.error) : this._onError(body.error);
             }
@@ -91,9 +91,11 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
         });
     }
     _onFirstFetchError(error) {
+        this.logger.debug("emitting error", error);
         this.emit('error', error);
     }
     _onError(error) {
+        this.logger.debug("emitting error", error);
         this.emit('error', error);
     }
     _read(size) {
