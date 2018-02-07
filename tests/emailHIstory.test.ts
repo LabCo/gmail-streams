@@ -4,9 +4,11 @@ import {GmailStreams, GoogleAuthTestHelper} from '../lib'
 import * as google from 'googleapis'
 import { setTimeout } from "timers";
 
+import {Message} from '../lib/types'
+
 describe("testing getting messages since a history id", () => {
 
-  const messages:google.gmail.v1.Message[] = []
+  const messages:Message[] = []
   let client: any = null
   beforeAll( done => {
     GmailStreams.setLogLevel("error")
@@ -23,13 +25,12 @@ describe("testing getting messages since a history id", () => {
       stream.on("error", (error:any) => done.fail(error))
       stream.on("end", () => done() )
     })
-  }, 20000);
+  }, 40000);
 
   it("recover from failing to fetch by history id by fetcing the last month", () => {
     const d = new Date()
     d.setMonth(d.getMonth() - 1);    
     
-    console.log("length:", messages.length)
     expect(messages.length).toBeGreaterThan(0)
 
     const lastMessage = messages[messages.length - 1]

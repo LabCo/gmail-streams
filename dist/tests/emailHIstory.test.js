@@ -17,11 +17,10 @@ describe("testing getting messages since a history id", () => {
             stream.on("error", (error) => done.fail(error));
             stream.on("end", () => done());
         });
-    }, 20000);
+    }, 40000);
     it("recover from failing to fetch by history id by fetcing the last month", () => {
         const d = new Date();
         d.setMonth(d.getMonth() - 1);
-        console.log("length:", messages.length);
         expect(messages.length).toBeGreaterThan(0);
         const lastMessage = messages[messages.length - 1];
         const lastDate = new Date(parseInt(lastMessage.internalDate));

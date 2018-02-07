@@ -1,4 +1,4 @@
-import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
+import { OAuth2Client } from 'google-auth-library';
 export declare class GoogleAuthTestHelper {
     static SCOPES: string[];
     static TOKEN_DIR: string;

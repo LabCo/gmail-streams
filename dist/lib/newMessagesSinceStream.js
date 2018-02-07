@@ -4,7 +4,7 @@ const google = require("googleapis");
 const gmail = google.gmail('v1');
 const paginatedGoogleApiStream_1 = require("./paginatedGoogleApiStream");
 /**
- * @param {google.gmail.v1.Message} out
+ * @param {Message} out
  */
 class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleApiStream {
     constructor(auth, historyId, maxPages, logLevel) {

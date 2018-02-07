@@ -5,18 +5,21 @@ import * as LeakyBucket from 'leaky-bucket'
 import { LabLogger } from "winston-lab"
 import * as winston from "winston"
 
+import {Transform} from 'stream'
 import ParallelTransform, {ParallelTransformOptions} from './parallelTransform'
-import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
+import {OAuth2Client} from 'google-auth-library'
+
+import {Thread} from './types'
 
 
 export declare interface ParitalThreadToFullThreadStream {
-  on(event: 'data', listener: (message: google.gmail.v1.Thread) => void): this;
+  on(event: 'data', listener: (message: Thread) => void): this;
   on(event: string, listener: Function): this;  
 }
 
 /**
- * @param {google.gmail.v1.Thread} in
- * @param {google.gmail.v1.Thread} out
+ * @param {Thread} in
+ * @param {Thread} out
  */
 export class ParitalThreadToFullThreadStream extends ParallelTransform {
 
@@ -25,7 +28,7 @@ export class ParitalThreadToFullThreadStream extends ParallelTransform {
   logger: winston.LoggerInstance
 
   constructor(auth: OAuth2Client, logLevel?: string) {
-    const withObjOptions = { maxParallel: 15, objectMode:true }
+    const withObjOptions = { objectMode:true, maxParallel: 40 }
     super(withObjOptions);
     this.auth = auth
     this.limiter = new LeakyBucket(200, 1, 100000);
@@ -33,12 +36,13 @@ export class ParitalThreadToFullThreadStream extends ParallelTransform {
     this.logger = LabLogger.createFromClass(this, logLevel)
   }
 
-  _parallelTransform(partialThread: google.gmail.v1.Thread, encoding: string, done: Function) {
+  _parallelTransform(partialThread: Thread, encoding: string, done: Function) {
 		const threadId = partialThread.id
     const params = { userId: "me", auth: this.auth, id:threadId, format:'metadata' }
 
     this.limiter.throttle(10).then( (v:any) => {
-      gmail.users.threads.get(params, (error, body) => {
+      gmail.users.threads.get(params, (error:any, response:any) => {
+        const body = response.data
         if(error) {
           this.logger.error("Failed to fetch thread", threadId, "error:", error)
           // do not want to emit an error becasue the will break processing, so just label as done and emit nothing

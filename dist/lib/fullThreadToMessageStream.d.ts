@@ -1,13 +1,14 @@
 /// <reference types="node" />
 import { Transform } from 'stream';
-import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
+import { OAuth2Client } from 'google-auth-library';
+import { Message } from './types';
 export interface FullThreadToMessageStream {
-    on(event: 'data', listener: (message: google.gmail.v1.Message) => void): this;
+    on(event: 'data', listener: (message: Message) => void): this;
     on(event: string, listener: Function): this;
 }
 /**
- * @param {google.gmail.v1.Thread} in
- * @param {google.gmail.v1.Message} out
+ * @param {Thread} in
+ * @param {Message} out
  */
 export declare class FullThreadToMessageStream extends Transform {
     auth: any;

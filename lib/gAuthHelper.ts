@@ -1,8 +1,7 @@
 import * as fs from 'fs'
 import * as readline from 'readline'
 
-import googleAuth = require('google-auth-library')
-import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
+import {OAuth2Client} from 'google-auth-library'
 
 export class GoogleAuthTestHelper {
 
@@ -49,8 +48,11 @@ export class GoogleAuthTestHelper {
     var clientSecret = credentials.installed.client_secret;
     var clientId = credentials.installed.client_id;
     var redirectUrl = credentials.installed.redirect_uris[0];
-    var auth = new googleAuth()
-    var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+    var oauth2Client = new OAuth2Client(
+      clientId,
+      clientSecret,
+      redirectUrl
+    );
 
     // Check if we have previously stored a token.
     const readFileP = new Promise<OAuth2Client>( (resolve, reject) => {

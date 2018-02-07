@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const readline = require("readline");
-const googleAuth = require("google-auth-library");
+const google_auth_library_1 = require("google-auth-library");
 class GoogleAuthTestHelper {
     static readFileP(fileName) {
         return new Promise((resolve, reject) => {
@@ -41,8 +41,7 @@ class GoogleAuthTestHelper {
         var clientSecret = credentials.installed.client_secret;
         var clientId = credentials.installed.client_id;
         var redirectUrl = credentials.installed.redirect_uris[0];
-        var auth = new googleAuth();
-        var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+        var oauth2Client = new google_auth_library_1.OAuth2Client(clientId, clientSecret, redirectUrl);
         // Check if we have previously stored a token.
         const readFileP = new Promise((resolve, reject) => {
             fs.readFile(this.TOKEN_PATH, function (err, token) {

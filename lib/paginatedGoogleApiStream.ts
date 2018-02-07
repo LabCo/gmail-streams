@@ -3,7 +3,7 @@ import { Readable, ReadableOptions } from 'stream'
 import { LabLogger } from "winston-lab"
 import * as winston from "winston"
 
-export type GApiCallback<T> = (error: any, body: T, response: any) => void
+export type GApiCallback<T> = (error: any, body: { data:T }, response: any) => void
 
 export interface GApiRes {
   nextPageToken: string
@@ -15,7 +15,7 @@ export interface GApiOptions {
 
 export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Readable {
 
-  protected fetchFn: (params:any, cb:GApiCallback<T>) => void
+  protected fetchFn: (params:any, options:any, cb:GApiCallback<T>) => void
   protected initialParams: any
   protected objectsExtractor: (body:T) => O[]
   objectsName: string
@@ -27,7 +27,7 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
   protected logLevel: string | undefined
   logger: winston.LoggerInstance
 
-  constructor(fetchFn: (params:any, cb:GApiCallback<T>) => void, 
+  constructor(fetchFn: (params:any, options:any, cb:GApiCallback<T>) => void, 
               initialParams: any, 
               objectsExtractor: (body:T) => O[], 
               objectsName: string, 
@@ -86,7 +86,8 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
 
     this.logger.info(chalk.blue.dim("Fetching next"), chalk.blue(this.objectsName), chalk.blue.dim("page with params"), JSON.stringify(paramsWOutAuth))
 
-    this.fetchFn(params, (error, body) => {
+    this.fetchFn(params, null, (error, res) => {
+      const body = res.data
       this.logger.debug("responded for fetching", JSON.stringify(paramsWOutAuth))
 
       if(error) {
@@ -96,7 +97,7 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
         isInitialFetch ? this._onFirstFetchError(error) : this._onError(error)
       }
       else if((<any>body).error) {
-        this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), error)        
+        this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), (<any>body).error)        
 
         this.fetchedObjects = []
         isInitialFetch ? this._onFirstFetchError((<any>body).error) : this._onError((<any>body).error)

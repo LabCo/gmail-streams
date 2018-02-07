@@ -50,7 +50,8 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
         let paramsWOutAuth = Object.assign({}, params);
         delete paramsWOutAuth["auth"];
         this.logger.info(chalk_1.default.blue.dim("Fetching next"), chalk_1.default.blue(this.objectsName), chalk_1.default.blue.dim("page with params"), JSON.stringify(paramsWOutAuth));
-        this.fetchFn(params, (error, body) => {
+        this.fetchFn(params, null, (error, res) => {
+            const body = res.data;
             this.logger.debug("responded for fetching", JSON.stringify(paramsWOutAuth));
             if (error) {
                 this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), error);
@@ -58,11 +59,12 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
                 isInitialFetch ? this._onFirstFetchError(error) : this._onError(error);
             }
             else if (body.error) {
-                this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), error);
+                this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), body.error);
                 this.fetchedObjects = [];
                 isInitialFetch ? this._onFirstFetchError(body.error) : this._onError(body.error);
             }
             else {
+                this.logger.debug("fetched for", JSON.stringify(paramsWOutAuth));
                 // no errors emitt the threads
                 // add the fetched threads
                 let objects = this.objectsExtractor(body);
@@ -93,10 +95,14 @@ class PaginatedGoogleApiStream extends stream_1.Readable {
     _onFirstFetchError(error) {
         this.logger.debug("emitting error", error);
         this.emit('error', error);
+        // an error happend, so we also have to end the stream becasue an error does not end it     
+        this.emit("end");
     }
     _onError(error) {
         this.logger.debug("emitting error", error);
         this.emit('error', error);
+        // an error happend, so we also have to end the stream becasue an error does not end it     
+        this.emit("end");
     }
     _read(size) {
         this.pushObject();

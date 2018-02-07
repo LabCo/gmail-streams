@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const stream_1 = require("stream");
 const threadListStream_1 = require("./threadListStream");
 const paritalThreadToFullThreadStream_1 = require("./paritalThreadToFullThreadStream");
 const fullThreadToMessageStream_1 = require("./fullThreadToMessageStream");
@@ -16,7 +17,7 @@ class GmailStreams {
      * @param authClient
      * @param params
      *
-     * @returns stream with {googleapis.gmail.v1.Message} as data
+     * @returns stream with {Message} as data
      */
     static messages(authClient, params) {
         if (authClient == null) {
@@ -43,7 +44,7 @@ class GmailStreams {
       * @param authClient
       * @param historyId
       *
-      * @returns stream with {googleapis.gmail.v1.Message} as data
+      * @returns stream with {Message} as data
       */
     static messagesSince(authClient, historyId) {
         if (historyId == null) {
@@ -54,9 +55,20 @@ class GmailStreams {
         }
         const newMessagesStream = new newMessagesSinceStream_1.NewMessagesSinceStream(authClient, historyId, undefined, this.logLevel);
         const gmailMessageStream = new partialMessageToFullMessageStream_1.PartialMessageToFullMessageStream(authClient, this.logLevel);
-        const stream = pumpify.obj(newMessagesStream, gmailMessageStream);
+        const dummyStream = new DummyTransform();
+        // have to pass a dummy transform because pumpify does not work when the last stream
+        // is a ParallelTransform 
+        const stream = pumpify.obj(newMessagesStream, gmailMessageStream, dummyStream);
         return stream;
     }
 }
-GmailStreams.logLevel = "error";
+GmailStreams.logLevel = "debug";
 exports.GmailStreams = GmailStreams;
+class DummyTransform extends stream_1.Transform {
+    constructor() {
+        super({ objectMode: true });
+    }
+    _transform(data, encoding, done) {
+        done(null, data);
+    }
+}

@@ -6,14 +6,18 @@ import { LabLogger } from "winston-lab"
 
 const LeakyBucket = require('leaky-bucket');
 
+import {Transform} from "stream"
 import ParallelTransform from './parallelTransform'
 
+import {Message} from './types'
+
+
 /**
- * @param {google.gmail.v1.Message} in
- * @param {google.gmail.v1.Message} out
+ * @param {Message} in
+ * @param {Message} out
  */
 export declare interface PartialMessageToFullMessageStream {
-  on(event: 'data', listener: (message: google.gmail.v1.Message) => void): this;
+  on(event: 'data', listener: (message: Message) => void): this;
   on(event: string, listener: Function): this;  
 }
 
@@ -24,7 +28,7 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
   logger: winston.LoggerInstance
 
   constructor(auth: any, logLevel:string) {
-    const withObjOptions = { maxParallel: 20, objectMode:true }
+    const withObjOptions = { objectMode:true, maxParallel: 40 }
     super(withObjOptions);
     this.auth = auth
     this.limiter = new LeakyBucket(200, 1, 100000);
@@ -32,7 +36,7 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
     this.logger = LabLogger.createFromClass(this, logLevel)
   }
 
-  _parallelTransform(partialMessage: google.gmail.v1.Message, encoding: string, done: Function) {
+  _parallelTransform(partialMessage: Message, encoding: string, done: Function) {
     const messageId = partialMessage.id
 
     if(messageId == null) {
@@ -43,7 +47,9 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
     const params = { userId: "me", auth: this.auth, id:messageId, format:'metadata' }
 
     this.limiter.throttle(5).then( (v:any) => {
-      gmail.users.messages.get(params, (error, body, response) => {
+      gmail.users.messages.get(params, {}, (error:any, response:any) => {
+        const body = response.data;
+
         if(error) {
           // some messages might have been deleted, so skip 404 errors
           if(response.statusCode == 404) {

@@ -1,24 +1,25 @@
 import * as google from 'googleapis'
 const gmail = google.gmail('v1');
 
+import {Message, ListHistoryResponse, ListMessagesResponse} from './types'
 import {PaginatedGoogleApiStream} from './paginatedGoogleApiStream'
 
 export declare interface NewMessagesSinceStream {
-  on(event: 'data', listener: (message: google.gmail.v1.Message) => void): this;
+  on(event: 'data', listener: (message: Message) => void): this;
   on(event: string, listener: Function): this;  
 }
 
 /**
- * @param {google.gmail.v1.Message} out
+ * @param {Message} out
  */
-export class NewMessagesSinceStream extends PaginatedGoogleApiStream<any, google.gmail.v1.Message> {
+export class NewMessagesSinceStream extends PaginatedGoogleApiStream<any, Message> {
 
-  test: google.Request
   historyId: string;
 
   constructor(auth: any, historyId: string, maxPages?: number, logLevel?: string) {
     const fetchFn = gmail.users.history.list
-    const objectsExtractor = (body:google.gmail.v1.ListHistoryResponse) => {
+
+    const objectsExtractor = (body:ListHistoryResponse) => {
       const history = body && body.history
       const addedMessages = history && history.map(h => h.messagesAdded.map( (ma) => ma.message))
         .reduce( (prev, curr) => prev.concat(curr)) // have to flatten the arrays
@@ -33,7 +34,6 @@ export class NewMessagesSinceStream extends PaginatedGoogleApiStream<any, google
   _onFirstFetchError(error: any) {    
     if(error && error.code != null && error.code == 404) {
       // fall back to fetching the last month of emails
-
       this.switchToMessagesFetch()
       this.fetchInNextPage(false)
     } else {
@@ -43,7 +43,7 @@ export class NewMessagesSinceStream extends PaginatedGoogleApiStream<any, google
 
   private switchToMessagesFetch() {
     const fetchFn = gmail.users.messages.list
-    const objectsExtractor = (body:google.gmail.v1.ListMessagesResponse) => {
+    const objectsExtractor = (body:ListMessagesResponse) => {
       const messages = body && body.messages
       return messages
     }

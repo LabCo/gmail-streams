@@ -7,7 +7,7 @@ const LeakyBucket = require('leaky-bucket');
 const parallelTransform_1 = require("./parallelTransform");
 class PartialMessageToFullMessageStream extends parallelTransform_1.default {
     constructor(auth, logLevel) {
-        const withObjOptions = { maxParallel: 20, objectMode: true };
+        const withObjOptions = { objectMode: true, maxParallel: 40 };
         super(withObjOptions);
         this.auth = auth;
         this.limiter = new LeakyBucket(200, 1, 100000);
@@ -21,7 +21,8 @@ class PartialMessageToFullMessageStream extends parallelTransform_1.default {
         }
         const params = { userId: "me", auth: this.auth, id: messageId, format: 'metadata' };
         this.limiter.throttle(5).then((v) => {
-            gmail.users.messages.get(params, (error, body, response) => {
+            gmail.users.messages.get(params, {}, (error, response) => {
+                const body = response.data;
                 if (error) {
                     // some messages might have been deleted, so skip 404 errors
                     if (response.statusCode == 404) {

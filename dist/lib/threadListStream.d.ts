@@ -1,12 +1,13 @@
 import { PaginatedGoogleApiStream, GApiOptions } from './paginatedGoogleApiStream';
-import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
+import { OAuth2Client } from 'google-auth-library';
+import { Thread, ListThreadsResponse } from './types';
 export interface ThreadListStream {
-    on(event: 'data', listener: (message: google.gmail.v1.Thread) => void): this;
+    on(event: 'data', listener: (message: Thread) => void): this;
     on(event: string, listener: Function): this;
 }
 /**
- * @param {google.gmail.v1.Thread} out
+ * @param {Thread} out
  */
-export declare class ThreadListStream extends PaginatedGoogleApiStream<google.gmail.v1.ListThreadsResponse, google.gmail.v1.Thread> {
+export declare class ThreadListStream extends PaginatedGoogleApiStream<ListThreadsResponse, Thread> {
     constructor(auth: OAuth2Client, query: any, params?: GApiOptions, logLevel?: string);
 }

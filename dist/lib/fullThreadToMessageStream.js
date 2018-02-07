@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const stream_1 = require("stream");
 /**
- * @param {google.gmail.v1.Thread} in
- * @param {google.gmail.v1.Message} out
+ * @param {Thread} in
+ * @param {Message} out
  */
 class FullThreadToMessageStream extends stream_1.Transform {
     constructor(auth) {

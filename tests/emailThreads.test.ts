@@ -4,9 +4,11 @@ import {GmailStreams, GoogleAuthTestHelper} from '../lib'
 import * as google from 'googleapis'
 import { setTimeout } from "timers";
 
+import {Message} from '../lib/types'
+
 describe("testing list streams", () => {
 
-  const messages:google.gmail.v1.Message[] = []
+  const messages:Message[] = []
   let client: any = null
   beforeAll( done => {
     GmailStreams.setLogLevel("error")    

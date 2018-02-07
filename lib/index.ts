@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import * as googleapis from 'googleapis';
+import * as google from 'googleapis';
 
 import { Transform } from "stream"
 
@@ -9,8 +9,10 @@ import {FullThreadToMessageStream} from './fullThreadToMessageStream'
 import {NewMessagesSinceStream} from './newMessagesSinceStream'
 import {PartialMessageToFullMessageStream} from './partialMessageToFullMessageStream'
 import pumpify = require('pumpify')
-import pump = require('pump')
-import { OAuth2Client } from 'google-auth-library/types/lib/auth/oauth2client';
+import {OAuth2Client} from 'google-auth-library'
+
+import {Message} from './types'
+
 
 export interface IGmailMsgsParams {
   from?: string,
@@ -19,7 +21,7 @@ export interface IGmailMsgsParams {
 }
 
 export declare interface GmailMessageStream extends NodeJS.ReadableStream {
-  on(event: 'data', listener: (message: google.gmail.v1.Message) => void): this;
+  on(event: 'data', listener: (message: any) => void): this;
   on(event: string, listener: Function): this;  
 }
 
@@ -27,7 +29,7 @@ export {GoogleAuthTestHelper} from "./gAuthHelper"
 
 export class GmailStreams {
 
-  private static logLevel = "error"
+  private static logLevel = "debug"
 
   static setLogLevel(level: string) {
     this.logLevel = level
@@ -37,7 +39,7 @@ export class GmailStreams {
    * @param authClient 
    * @param params 
    * 
-   * @returns stream with {googleapis.gmail.v1.Message} as data
+   * @returns stream with {Message} as data
    */
   static messages(authClient: OAuth2Client, params?: IGmailMsgsParams): GmailMessageStream {
     if(authClient == null) {
@@ -62,7 +64,7 @@ export class GmailStreams {
    * @param authClient 
    * @param historyId 
    * 
-   * @returns stream with {googleapis.gmail.v1.Message} as data
+   * @returns stream with {Message} as data
    */
   static messagesSince(authClient: OAuth2Client, historyId:string) {
     if(historyId == null) { throw new Error("historyId is not defined") }
@@ -83,6 +85,10 @@ export class GmailStreams {
 }
 
 class DummyTransform extends Transform {
+
+  constructor() {
+    super({ objectMode:true });
+  }
 
   _transform(data: any, encoding: string, done: Function) {
     done(null, data)

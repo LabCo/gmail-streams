@@ -6,12 +6,12 @@ const LeakyBucket = require("leaky-bucket");
 const winston_lab_1 = require("winston-lab");
 const parallelTransform_1 = require("./parallelTransform");
 /**
- * @param {google.gmail.v1.Thread} in
- * @param {google.gmail.v1.Thread} out
+ * @param {Thread} in
+ * @param {Thread} out
  */
 class ParitalThreadToFullThreadStream extends parallelTransform_1.default {
     constructor(auth, logLevel) {
-        const withObjOptions = { maxParallel: 15, objectMode: true };
+        const withObjOptions = { objectMode: true, maxParallel: 40 };
         super(withObjOptions);
         this.auth = auth;
         this.limiter = new LeakyBucket(200, 1, 100000);
@@ -21,7 +21,8 @@ class ParitalThreadToFullThreadStream extends parallelTransform_1.default {
         const threadId = partialThread.id;
         const params = { userId: "me", auth: this.auth, id: threadId, format: 'metadata' };
         this.limiter.throttle(10).then((v) => {
-            gmail.users.threads.get(params, (error, body) => {
+            gmail.users.threads.get(params, (error, response) => {
+                const body = response.data;
                 if (error) {
                     this.logger.error("Failed to fetch thread", threadId, "error:", error);
                     // do not want to emit an error becasue the will break processing, so just label as done and emit nothing

@@ -5,6 +5,8 @@ import {GmailStreams, GoogleAuthTestHelper} from "../lib"
 import * as google from 'googleapis'
 import { setTimeout } from "timers";
 
+import {Thread} from '../lib/types'
+
 describe("testing list streams", () => {
 
   let client: any = null
@@ -20,7 +22,7 @@ describe("testing list streams", () => {
   });
 
   it("test pagination", done => {
-    const threads: google.gmail.v1.Thread[] = []
+    const threads: Thread[] = []
     const query = "before:1481961600 after:1481270400"
 
     let counter = 0
