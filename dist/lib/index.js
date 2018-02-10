@@ -62,7 +62,7 @@ class GmailStreams {
         return stream;
     }
 }
-GmailStreams.logLevel = "debug";
+GmailStreams.logLevel = "warn";
 exports.GmailStreams = GmailStreams;
 class DummyTransform extends stream_1.Transform {
     constructor() {

@@ -29,7 +29,7 @@ export {GoogleAuthTestHelper} from "./gAuthHelper"
 
 export class GmailStreams {
 
-  private static logLevel = "debug"
+  private static logLevel = "warn"
 
   static setLogLevel(level: string) {
     this.logLevel = level
