@@ -11,11 +11,22 @@ class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleA
         const fetchFn = gmail.users.history.list;
         const objectsExtractor = (body) => {
             const history = body && body.history;
-            const addedMessages = history && history.map(h => h.messagesAdded.map((ma) => ma.message))
+            const addedMessages = history && history.map(h => h.messages)
                 .reduce((prev, curr) => prev.concat(curr)); // have to flatten the arrays
-            return addedMessages;
+            // have to remove duplicates
+            const dedupedMessages = addedMessages.reduce(function (mById, m) {
+                if (m.id == null)
+                    return mById;
+                const found = mById[m.id];
+                if (!found) {
+                    mById[m.id] = m;
+                }
+                return mById;
+            }, {});
+            return Object.keys(dedupedMessages).map(k => dedupedMessages[k]);
         };
-        const initialParams = { auth: auth, userId: "me", startHistoryId: historyId, historyTypes: 'messageAdded', maxResults: 1000 };
+        // searching for only `messageAdded` does not work, because sometimes not everuy new messages comes throug, not sure why
+        const initialParams = { auth: auth, userId: "me", startHistoryId: historyId, maxResults: 1000 };
         super(fetchFn, initialParams, objectsExtractor, 'new messages list', maxPages, logLevel);
         this.historyId = historyId;
     }

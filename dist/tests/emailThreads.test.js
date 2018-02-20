@@ -21,6 +21,7 @@ describe("testing list streams", () => {
     it("fetch the expected number of messages", done => {
         expect(messages.length).toEqual(74);
         const firstMsg = messages[0];
+        console.log(JSON.stringify(firstMsg, null, 2));
         expect(firstMsg.snippet).toEqual("Resin Talk A brief summary of Resin Talk since your last visit on December 7 Popular posts Roombots - RPi2 and Roomba powered networked robots Projects This time it&#39;s not my own project, but");
         expect(firstMsg.internalDate).toEqual("1481757691000");
         done();
