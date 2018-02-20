@@ -87,7 +87,6 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
     this.logger.info(chalk.blue.dim("Fetching next"), chalk.blue(this.objectsName), chalk.blue.dim("page with params"), JSON.stringify(paramsWOutAuth))
 
     this.fetchFn(params, null, (error, res) => {
-      const body = res.data
       this.logger.debug("responded for fetching", JSON.stringify(paramsWOutAuth))
 
       if(error) {
@@ -95,8 +94,19 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
 
         this.fetchedObjects = []
         isInitialFetch ? this._onFirstFetchError(error) : this._onError(error)
+        return;
       }
-      else if((<any>body).error) {
+
+      if(res == null) {
+        this.logger.error("returned empty response for", JSON.stringify(paramsWOutAuth))
+
+        const error = "returned empty response"
+        this._onError(error)
+        return
+      }
+
+      const body = res.data
+      if((<any>body).error) {
         this.logger.error("failed to fetch for", JSON.stringify(paramsWOutAuth), (<any>body).error)        
 
         this.fetchedObjects = []

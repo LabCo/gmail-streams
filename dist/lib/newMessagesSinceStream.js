@@ -10,9 +10,12 @@ class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleA
     constructor(auth, historyId, maxPages, logLevel) {
         const fetchFn = gmail.users.history.list;
         const objectsExtractor = (body) => {
-            const history = body && body.history;
-            const addedMessages = history && history.map(h => h.messages)
-                .reduce((prev, curr) => prev.concat(curr)); // have to flatten the arrays
+            let history = body && body.history;
+            if (history == null) {
+                history = [];
+            }
+            console.log("HISTORY:", history);
+            const addedMessages = history && history.map(h => h.messages).reduce((prev, curr) => prev.concat(curr), []); // have to flatten the arrays
             // have to remove duplicates
             const dedupedMessages = addedMessages.reduce(function (mById, m) {
                 if (m.id == null)
