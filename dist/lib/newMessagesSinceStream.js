@@ -16,7 +16,7 @@ class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleA
             }
             const addedMessages = history && history.map(h => h.messages).reduce((prev, curr) => prev.concat(curr), []); // have to flatten the arrays
             // have to remove duplicates
-            const dedupedMessages = addedMessages.reduce(function (mById, m) {
+            const dedupedMessagesMap = addedMessages.reduce(function (mById, m) {
                 if (m.id == null)
                     return mById;
                 const found = mById[m.id];
@@ -25,7 +25,8 @@ class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleA
                 }
                 return mById;
             }, {});
-            return Object.keys(dedupedMessages).map(k => dedupedMessages[k]);
+            const dedupedMessages = Object.keys(dedupedMessagesMap).map(k => dedupedMessagesMap[k]);
+            return dedupedMessages;
         };
         // searching for only `messageAdded` does not work, because sometimes not everuy new messages comes throug, not sure why
         const initialParams = { auth: auth, userId: "me", startHistoryId: historyId, maxResults: 1000 };
