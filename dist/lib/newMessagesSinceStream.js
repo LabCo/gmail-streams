@@ -14,7 +14,6 @@ class NewMessagesSinceStream extends paginatedGoogleApiStream_1.PaginatedGoogleA
             if (history == null) {
                 history = [];
             }
-            console.log("HISTORY:", history);
             const addedMessages = history && history.map(h => h.messages).reduce((prev, curr) => prev.concat(curr), []); // have to flatten the arrays
             // have to remove duplicates
             const dedupedMessages = addedMessages.reduce(function (mById, m) {
