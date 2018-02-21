@@ -9,6 +9,7 @@ export interface NewMessagesSinceStream {
  */
 export declare class NewMessagesSinceStream extends PaginatedGoogleApiStream<any, Message> {
     historyId: string;
+    extractedHistoryId?: string;
     constructor(auth: any, historyId: string, maxPages?: number, logLevel?: string);
     _onFirstFetchError(error: any): void;
     private switchToMessagesFetch();

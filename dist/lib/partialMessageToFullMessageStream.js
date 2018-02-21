@@ -27,7 +27,8 @@ class PartialMessageToFullMessageStream extends parallelTransform_1.default {
                     // some messages might have been deleted, so skip 404 errors
                     if (response.status == 404) {
                         this.logger.debug(`message ${messageId} was deleted`);
-                        done();
+                        // pass through the partial message so we can still record the history id value
+                        done(null, partialMessage);
                     }
                     else {
                         this.logger.error("Failed to fetch message", messageId, "error:", error);
