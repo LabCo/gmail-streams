@@ -25,7 +25,8 @@ class PartialMessageToFullMessageStream extends parallelTransform_1.default {
                 const body = response.data;
                 if (error) {
                     // some messages might have been deleted, so skip 404 errors
-                    if (response.statusCode == 404) {
+                    if (response.status == 404) {
+                        this.logger.debug(`message ${messageId} was deleted`);
                         done();
                     }
                     else {

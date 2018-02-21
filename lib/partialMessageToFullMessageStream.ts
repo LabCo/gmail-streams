@@ -50,9 +50,10 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
       gmail.users.messages.get(params, {}, (error:any, response:any) => {
         const body = response.data;
 
-        if(error) {
+        if(error) {          
           // some messages might have been deleted, so skip 404 errors
-          if(response.statusCode == 404) {
+          if(response.status == 404) {
+            this.logger.debug(`message ${messageId} was deleted`)
             done()
           } else {
             this.logger.error("Failed to fetch message", messageId, "error:", error)
