@@ -15,6 +15,7 @@ export declare class ParitalThreadToFullThreadStream extends ParallelTransform {
     auth: any;
     limiter: any;
     logger: winston.LoggerInstance;
-    constructor(auth: OAuth2Client, logLevel?: string);
+    additionalParams: any;
+    constructor(auth: OAuth2Client, additionalParams: any, logLevel?: string);
     _parallelTransform(partialThread: Thread, encoding: string, done: Function): void;
 }

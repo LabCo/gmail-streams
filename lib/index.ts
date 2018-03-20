@@ -41,7 +41,7 @@ export class GmailStreams {
    * 
    * @returns stream with {Message} as data
    */
-  static messages(authClient: OAuth2Client, params?: IGmailMsgsParams): GmailMessageStream {
+  static messages(authClient: OAuth2Client, params?: IGmailMsgsParams, messageLookupParams?:any): GmailMessageStream {
     if(authClient == null) {
       throw new Error("authClient is not defined")
     }
@@ -53,7 +53,7 @@ export class GmailStreams {
     const qString = (qArray.length > 0) ? qArray.join(" ") : null
 
     const threadListStream = new ThreadListStream(authClient, qString, undefined, this.logLevel)
-    const fullThreadStream = new ParitalThreadToFullThreadStream(authClient, this.logLevel)
+    const fullThreadStream = new ParitalThreadToFullThreadStream(authClient, messageLookupParams, this.logLevel)
     const gmailMessageStream = new FullThreadToMessageStream(authClient) 
 
     const messagesStream = pumpify.obj(threadListStream, fullThreadStream, gmailMessageStream)
@@ -66,14 +66,14 @@ export class GmailStreams {
    * 
    * @returns stream with {Message} as data
    */
-  static messagesSince(authClient: OAuth2Client, historyId:string) {
+  static messagesSince(authClient: OAuth2Client, historyId:string, messageLookupParams?:any) {
     if(historyId == null) { throw new Error("historyId is not defined") }
     if (! (typeof historyId === 'string') ) {
       throw new Error("historyId is not a string")
     }
 
     const newMessagesStream = new NewMessagesSinceStream(authClient, historyId, undefined, this.logLevel)
-    const gmailMessageStream = new PartialMessageToFullMessageStream(authClient, this.logLevel)
+    const gmailMessageStream = new PartialMessageToFullMessageStream(authClient, this.logLevel, messageLookupParams)
     const dummyStream = new DummyTransform()    
 
     // have to pass a dummy transform because pumpify does not work when the last stream

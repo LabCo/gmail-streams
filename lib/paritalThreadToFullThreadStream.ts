@@ -27,18 +27,22 @@ export class ParitalThreadToFullThreadStream extends ParallelTransform {
   limiter: any
   logger: winston.LoggerInstance
 
-  constructor(auth: OAuth2Client, logLevel?: string) {
+  additionalParams: any;
+
+  constructor(auth: OAuth2Client, additionalParams: any, logLevel?: string) {
     const withObjOptions = { objectMode:true, maxParallel: 40 }
     super(withObjOptions);
     this.auth = auth
     this.limiter = new LeakyBucket(200, 1, 100000);
+    this.additionalParams = additionalParams;
 
     this.logger = LabLogger.createFromClass(this, logLevel)
   }
 
   _parallelTransform(partialThread: Thread, encoding: string, done: Function) {
 		const threadId = partialThread.id
-    const params = { userId: "me", auth: this.auth, id:threadId, format:'metadata' }
+    const defaultParams = { userId: "me", auth: this.auth, id:threadId, format:'metadata' }
+    const params = Object.assign({}, defaultParams, this.additionalParams)
 
     this.limiter.throttle(10).then( (v:any) => {
       gmail.users.threads.get(params, (error:any, response:any) => {

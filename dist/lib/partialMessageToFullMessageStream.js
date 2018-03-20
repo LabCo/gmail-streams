@@ -6,11 +6,12 @@ const winston_lab_1 = require("winston-lab");
 const LeakyBucket = require('leaky-bucket');
 const parallelTransform_1 = require("./parallelTransform");
 class PartialMessageToFullMessageStream extends parallelTransform_1.default {
-    constructor(auth, logLevel) {
+    constructor(auth, logLevel, additionalParams) {
         const withObjOptions = { objectMode: true, maxParallel: 40 };
         super(withObjOptions);
         this.auth = auth;
         this.limiter = new LeakyBucket(200, 1, 100000);
+        this.additionalParams = additionalParams;
         this.logger = winston_lab_1.LabLogger.createFromClass(this, logLevel);
     }
     _parallelTransform(partialMessage, encoding, done) {
@@ -19,7 +20,8 @@ class PartialMessageToFullMessageStream extends parallelTransform_1.default {
             this.push("message id is null");
             return;
         }
-        const params = { userId: "me", auth: this.auth, id: messageId, format: 'metadata' };
+        const defaultParams = { userId: "me", auth: this.auth, id: messageId, format: 'metadata' };
+        const params = Object.assign({}, defaultParams, this.additionalParams);
         this.limiter.throttle(5).then((v) => {
             gmail.users.messages.get(params, {}, (error, response) => {
                 const body = response.data;

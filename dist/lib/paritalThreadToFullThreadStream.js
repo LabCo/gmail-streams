@@ -10,16 +10,18 @@ const parallelTransform_1 = require("./parallelTransform");
  * @param {Thread} out
  */
 class ParitalThreadToFullThreadStream extends parallelTransform_1.default {
-    constructor(auth, logLevel) {
+    constructor(auth, additionalParams, logLevel) {
         const withObjOptions = { objectMode: true, maxParallel: 40 };
         super(withObjOptions);
         this.auth = auth;
         this.limiter = new LeakyBucket(200, 1, 100000);
+        this.additionalParams = additionalParams;
         this.logger = winston_lab_1.LabLogger.createFromClass(this, logLevel);
     }
     _parallelTransform(partialThread, encoding, done) {
         const threadId = partialThread.id;
-        const params = { userId: "me", auth: this.auth, id: threadId, format: 'metadata' };
+        const defaultParams = { userId: "me", auth: this.auth, id: threadId, format: 'metadata' };
+        const params = Object.assign({}, defaultParams, this.additionalParams);
         this.limiter.throttle(10).then((v) => {
             gmail.users.threads.get(params, (error, response) => {
                 const body = response.data;

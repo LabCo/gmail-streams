@@ -19,7 +19,7 @@ class GmailStreams {
      *
      * @returns stream with {Message} as data
      */
-    static messages(authClient, params) {
+    static messages(authClient, params, messageLookupParams) {
         if (authClient == null) {
             throw new Error("authClient is not defined");
         }
@@ -35,7 +35,7 @@ class GmailStreams {
         }
         const qString = (qArray.length > 0) ? qArray.join(" ") : null;
         const threadListStream = new threadListStream_1.ThreadListStream(authClient, qString, undefined, this.logLevel);
-        const fullThreadStream = new paritalThreadToFullThreadStream_1.ParitalThreadToFullThreadStream(authClient, this.logLevel);
+        const fullThreadStream = new paritalThreadToFullThreadStream_1.ParitalThreadToFullThreadStream(authClient, messageLookupParams, this.logLevel);
         const gmailMessageStream = new fullThreadToMessageStream_1.FullThreadToMessageStream(authClient);
         const messagesStream = pumpify.obj(threadListStream, fullThreadStream, gmailMessageStream);
         return messagesStream;
@@ -46,7 +46,7 @@ class GmailStreams {
       *
       * @returns stream with {Message} as data
       */
-    static messagesSince(authClient, historyId) {
+    static messagesSince(authClient, historyId, messageLookupParams) {
         if (historyId == null) {
             throw new Error("historyId is not defined");
         }
@@ -54,7 +54,7 @@ class GmailStreams {
             throw new Error("historyId is not a string");
         }
         const newMessagesStream = new newMessagesSinceStream_1.NewMessagesSinceStream(authClient, historyId, undefined, this.logLevel);
-        const gmailMessageStream = new partialMessageToFullMessageStream_1.PartialMessageToFullMessageStream(authClient, this.logLevel);
+        const gmailMessageStream = new partialMessageToFullMessageStream_1.PartialMessageToFullMessageStream(authClient, this.logLevel, messageLookupParams);
         const dummyStream = new DummyTransform();
         // have to pass a dummy transform because pumpify does not work when the last stream
         // is a ParallelTransform 

@@ -27,11 +27,14 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
   limiter: any
   logger: winston.LoggerInstance
 
-  constructor(auth: any, logLevel:string) {
+  additionalParams: any;
+
+  constructor(auth: any, logLevel:string, additionalParams?: any) {
     const withObjOptions = { objectMode:true, maxParallel: 40 }
     super(withObjOptions);
     this.auth = auth
     this.limiter = new LeakyBucket(200, 1, 100000);
+    this.additionalParams = additionalParams;
 
     this.logger = LabLogger.createFromClass(this, logLevel)
   }
@@ -44,7 +47,8 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
       return
     }
 
-    const params = { userId: "me", auth: this.auth, id:messageId, format:'metadata' }
+    const defaultParams = { userId: "me", auth: this.auth, id:messageId, format:'metadata' }
+    const params = Object.assign({}, defaultParams, this.additionalParams)
 
     this.limiter.throttle(5).then( (v:any) => {
       gmail.users.messages.get(params, {}, (error:any, response:any) => {
@@ -54,6 +58,10 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
           // some messages might have been deleted, so skip 404 errors
           if(response.status == 404) {
             this.logger.debug(`message ${messageId} was deleted`)
+
+            // flag the message as deleted
+            partialMessage.deleted = true
+            
             // pass through the partial message so we can still record the history id value
             done(null, partialMessage)
           } else {
@@ -73,6 +81,8 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
           }
         }
         else {
+          this.logger.debug("Got message:", JSON.stringify(body, null, 2))
+
           const fullMessage = body
           done(null, fullMessage)
         }

@@ -14,6 +14,7 @@ export declare class PartialMessageToFullMessageStream extends ParallelTransform
     auth: any;
     limiter: any;
     logger: winston.LoggerInstance;
-    constructor(auth: any, logLevel: string);
+    additionalParams: any;
+    constructor(auth: any, logLevel: string, additionalParams?: any);
     _parallelTransform(partialMessage: Message, encoding: string, done: Function): void;
 }

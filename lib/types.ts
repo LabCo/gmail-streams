@@ -10,6 +10,7 @@ export interface Message {
   'sizeEstimate': number;
   'snippet': string;
   'threadId': string;
+  'deleted' : boolean; // a special hack to pass through deleted messages so history id can be recorded
 }
 
 export interface MessagePart {

@@ -18,12 +18,12 @@ export declare class GmailStreams {
      *
      * @returns stream with {Message} as data
      */
-    static messages(authClient: OAuth2Client, params?: IGmailMsgsParams): GmailMessageStream;
+    static messages(authClient: OAuth2Client, params?: IGmailMsgsParams, messageLookupParams?: any): GmailMessageStream;
     /**
       * @param authClient
       * @param historyId
       *
       * @returns stream with {Message} as data
       */
-    static messagesSince(authClient: OAuth2Client, historyId: string): GmailMessageStream;
+    static messagesSince(authClient: OAuth2Client, historyId: string, messageLookupParams?: any): GmailMessageStream;
 }

@@ -16,7 +16,7 @@ let client:any = null
 describe("testing getting full message", () => {
 
 
-  it("fail gradual when accessing a not found messages", async () => {
+  it("pass through the deleted message", async () => {
     client = await GoogleAuthTestHelper.getClient()
 
     const bareMessage = {
@@ -24,7 +24,7 @@ describe("testing getting full message", () => {
     }
 
     var inStream = new Readable( { objectMode: true} )
-    const toMessageStream = new PartialMessageToFullMessageStream(client, "info")
+    const toMessageStream = new PartialMessageToFullMessageStream(client, "warn")
     const stream = pumpify.obj(inStream, toMessageStream)
 
 
@@ -34,13 +34,20 @@ describe("testing getting full message", () => {
       inStream.push(bareMessage);
       inStream.push(null);
 
-      stream.on("data", (data:Message) => messages.push(data));
+      stream.on("data", (data:Message) => {
+        messages.push(data)
+      });
       stream.on("error", (error:any) => errors.push(error));
       stream.on("end", () => resolve(true));
     })
 
-    expect(messages.length).toEqual(0)
+    expect(messages.length).toEqual(1)
     expect(errors.length).toEqual(0)
+
+    const message = messages[0]
+    expect(message.id).toEqual("161b49b3be396056")
+    expect(message.deleted).toBeTruthy()
   })
+
 
 })
