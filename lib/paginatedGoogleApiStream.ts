@@ -1,4 +1,3 @@
-import chalk from  "chalk"
 import { Readable, ReadableOptions } from 'stream'
 import { LabLogger } from "winston-lab"
 import * as winston from "winston"
@@ -84,7 +83,7 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
     let paramsWOutAuth = Object.assign({}, params)
     delete paramsWOutAuth["auth"]
 
-    this.logger.info(chalk.blue.dim("Fetching next"), chalk.blue(this.objectsName), chalk.blue.dim("page with params"), JSON.stringify(paramsWOutAuth))
+    this.logger.info("Fetching next",this.objectsName, "page with params", JSON.stringify(paramsWOutAuth))
 
     this.fetchFn(params, null, (error, res) => {
       this.logger.debug("responded for fetching", JSON.stringify(paramsWOutAuth))
@@ -125,9 +124,9 @@ export abstract class PaginatedGoogleApiStream<T extends GApiRes, O> extends Rea
         this.fetchedObjects = (this.fetchedObjects) ? this.fetchedObjects.concat(objects) : objects
 
         if(body.nextPageToken) {
-          this.logger.info(chalk.blue.dim("Fetched page for"), chalk.blue(this.objectsName), chalk.blue.dim("next page is:"), body.nextPageToken)
+          this.logger.info("Fetched page for", this.objectsName, "next page is:", body.nextPageToken)
         } else {
-          this.logger.info(chalk.blue.dim("Fetched the last page for"), chalk.blue(this.objectsName))
+          this.logger.info("Fetched the last page for", this.objectsName)
         }
 
         // update the next page token

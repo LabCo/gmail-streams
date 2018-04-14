@@ -1,4 +1,4 @@
-import * as google from 'googleapis'
+import {google} from 'googleapis'
 const gmail = google.gmail('v1');
 
 import * as winston from "winston"
@@ -10,6 +10,7 @@ import {Transform} from "stream"
 import ParallelTransform from './parallelTransform'
 
 import {Message} from './types'
+import { Schema$Message } from 'googleapis/build/src/apis/gmail/v1';
 
 
 /**
@@ -51,6 +52,13 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
     const params = Object.assign({}, defaultParams, this.additionalParams)
 
     this.limiter.throttle(5).then( (v:any) => {
+      return gmail.users.messages.get(params)
+    }).then( (message:Schema$Message) => {
+      res.
+    }).catch( (error:Error) => {
+
+    })
+
       gmail.users.messages.get(params, {}, (error:any, response:any) => {
         const body = response.data;
 

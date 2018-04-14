@@ -1,12 +1,12 @@
 import {} from "jest"
 import {GmailStreams, GoogleAuthTestHelper} from '../lib'
 
-import * as google from 'googleapis'
 import { setTimeout } from "timers";
 
 import {Message} from '../lib/types'
 import { resolve } from "url";
 
+import {google} from 'googleapis'
 const gmail = google.gmail('v1');
 
 import * as moment from "moment"
@@ -56,7 +56,7 @@ describe("testing getting messages since a history id", () => {
 
     let params = { userId: "me", auth: client, maxResults:100 }
     const messagesRes:any = await new Promise( (resolve, resject) => {
-      gmail.users.messages.list(params, null, (error: any, res: any) => {
+      gmail.users.messages.list(params, {}, (error: any, res: any) => {
         if(error) { resject(error) }
         else { resolve(res) }
       })
@@ -71,7 +71,7 @@ describe("testing getting messages since a history id", () => {
     // fetch in the message
     let messageParams = { userId: "me", auth: client, id:message.id }
     const messageRes:any = await new Promise( (resolve, reject) => {
-      gmail.users.messages.get(messageParams, null, (error: any, res: any) => {
+      gmail.users.messages.get(messageParams, {}, (error: any, res: any) => {
         if(error) { reject(error) }
         else { resolve(res) }
       })

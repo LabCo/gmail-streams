@@ -1,4 +1,4 @@
-import * as google from 'googleapis'
+import {google} from 'googleapis'
 const gmail = google.gmail('v1');
 
 import {ReadableOptions} from "stream"

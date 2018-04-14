@@ -2,7 +2,6 @@ import {} from "jest"
 import {ThreadListStream} from '../lib/threadListStream'
 
 import {GmailStreams, GoogleAuthTestHelper} from "../lib"
-import * as google from 'googleapis'
 import { setTimeout } from "timers";
 
 import {Thread} from '../lib/types'
