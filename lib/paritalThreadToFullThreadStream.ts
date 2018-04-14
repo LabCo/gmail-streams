@@ -46,10 +46,14 @@ export class ParitalThreadToFullThreadStream extends ParallelTransform {
 
     this.limiter.throttle(10).then( (v:any) => {
       gmail.users.threads.get(params, (error:any, response:any) => {
-        const body = response.data
+        const body = response && response.data
         if(error) {
           this.logger.error("Failed to fetch thread", threadId, "error:", error)
           // do not want to emit an error becasue the will break processing, so just label as done and emit nothing
+          done()
+        }
+        else if(body == null) {
+          this.logger.error("Body is null", threadId)          
           done()
         }
         else if((<any>body).error) {

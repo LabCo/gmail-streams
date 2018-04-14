@@ -52,7 +52,7 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
 
     this.limiter.throttle(5).then( (v:any) => {
       gmail.users.messages.get(params, {}, (error:any, response:any) => {
-        const body = response.data;
+        const body = response && response.data;
 
         if(error) {          
           // some messages might have been deleted, so skip 404 errors
@@ -69,6 +69,10 @@ export class PartialMessageToFullMessageStream extends ParallelTransform {
             // do not want to emit an error becasue the will break processing, so just label as done and emit nothing
             done()
           }
+        }
+        else if(body == null) {
+          this.logger.error("Body is null", messageId)          
+          done()
         }
         else if((<any>body).error) {
           // some messages might have been deleted, so skip 404 errors
